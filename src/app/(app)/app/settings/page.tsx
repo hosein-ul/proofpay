@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/app/page-header";
 import { SettingsView } from "@/components/app/settings-view";
+import { liveConfig } from "@/lib/server/primus";
 import { getMode, settingsData } from "@/lib/server/repo";
 
 export const metadata: Metadata = { title: "Settings" };
@@ -11,7 +12,7 @@ export default async function SettingsPage() {
   return (
     <>
       <PageHeader title="Settings" description="Workspace, access and environment." />
-      <SettingsView mode={mode} liveConfigured={!!(process.env.PRIMUS_APP_ID && process.env.PRIMUS_APP_SECRET)} {...data} />
+      <SettingsView mode={mode} liveConfigured={liveConfig().ready} {...data} />
     </>
   );
 }

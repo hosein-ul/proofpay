@@ -11,7 +11,7 @@ export async function POST(req: Request, ctx: RouteContext<"/api/tasks/[id]/proo
     limit(req, `proof:${id}`, 10);
     const body = await parseBody(req, SubmitProofSchema);
     const r = await withIdempotency(req.headers.get("idempotency-key"), `POST /api/tasks/${id}/proof`, async () => {
-      const out = await submitProof(id, { value: body.value }, { role: "worker", name: body.actor ?? "Worker" });
+      const out = await submitProof(id, { value: body.value, attestation: body.attestation }, { role: "worker", name: body.actor ?? "Worker" });
       return { status: 200, body: out };
     });
     return json(r.body, { status: r.status, headers: r.replayed ? { "idempotent-replayed": "true" } : {} });

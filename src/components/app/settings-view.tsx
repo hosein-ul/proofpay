@@ -69,7 +69,7 @@ export function SettingsView({ mode, liveConfigured, members, keys, webhooks, de
             <ModeBadge mode={mode} />
             <Segmented aria-label="Mode" value={mode} onValueChange={(v) => setMode.mutate(v as Mode)} options={[{ value: "simulation", label: "Simulation" }, { value: "live", label: "Live (testnet)" }]} />
           </div>
-          {!liveConfigured && <p className="mt-3 text-[13px] text-text-2">Live needs <code className="mono text-[12px]">PRIMUS_APP_ID</code> and <code className="mono text-[12px]">PRIMUS_APP_SECRET</code> set on the server. They are never sent to the browser.</p>}
+          {!liveConfigured && <p className="mt-3 text-[13px] text-text-2">Live needs <code className="mono text-[12px]">PRIMUS_APP_ID</code> and <code className="mono text-[12px]">PRIMUS_APP_SECRET</code>, <code className="mono text-[12px]">PRIMUS_TEMPLATE_ID</code> and <code className="mono text-[12px]">PRIMUS_ATTESTORS</code> set on the server. They are never sent to the browser.</p>}
           <div className="mt-4 flex items-center gap-3 border-t border-line pt-4">
             <Button variant="secondary" size="sm" loading={reset.isPending} onClick={() => reset.mutate()}>Reset demo data</Button>
             <span className="text-[12.5px] text-text-3">Restores the seeded workspace. Simulation only.</span>

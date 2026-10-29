@@ -18,11 +18,14 @@ export interface Evidence {
   value?: number;
   /** override the timestamp (tests, seeds) */
   timestamp?: number;
+  /** Live: the attestation the browser SDK returned (see docs/primus-notes.md). Mapped and re-verified here, never trusted as-is. */
+  attestation?: unknown;
   /** extra private fields the source returned, kept off the attestation */
   privateFields?: { key: string; value: string }[];
 }
 
 export interface VerifyOptions {
+  /** Live: attestor addresses the environment trusts (PRIMUS_ATTESTORS). Simulation defaults to the local test key. */
   registeredAttestors?: string[];
   consumedDigests: Set<string>;
   now?: number;

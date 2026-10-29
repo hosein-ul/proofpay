@@ -11,3 +11,9 @@ contracts/out
 contracts/cache
 contracts/broadcast
 .design/shots
+
+# Foundry
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+contracts/lib/

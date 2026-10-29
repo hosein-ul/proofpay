@@ -8,12 +8,14 @@ import type { Evidence, ProofProvider } from "@/lib/domain/provider";
 import { SimulatedProvider } from "@/lib/domain/simulated-provider";
 import { assertTransition, TransitionError } from "@/lib/domain/state-machine";
 import type { Condition, Mode, Role, Task, TaskState, VerificationResult } from "@/lib/domain/types";
+import { PrimusProvider } from "@/lib/domain/primus-provider";
+import { liveConfig } from "./primus";
 import { consumedDigests, getMode, getTask, getWorker, ready, toTask } from "./repo";
 
 export function getProvider(mode: Mode): ProofProvider {
   if (mode === "live") {
-    // Phase 4: PrimusProvider. Until credentials and a template exist, refuse clearly rather than fake it.
-    throw new DomainError("bad_request", "Live mode is not configured. Add Primus credentials and a template (see README → Live mode), or switch to Simulation.", 400);
+    if (!liveConfig().ready) throw new DomainError("bad_request", "Live mode is not configured. Add Primus credentials, a template and the attestor list (see README → Live mode), or switch to Simulation.", 400);
+    return new PrimusProvider();
   }
   return new SimulatedProvider();
 }
@@ -153,7 +155,7 @@ export async function submitProof(id: string, evidence: Evidence, actor: Actor):
   const req = await provider.createRequest(t, worker);
   const att = await provider.submit(req, t, evidence);
   const consumed = await consumedDigests();
-  const verification = await provider.verify(att, t, worker, { consumedDigests: consumed });
+  const verification = await provider.verify(att, t, worker, { consumedDigests: consumed, registeredAttestors: t.mode === "live" ? liveConfig().attestors : undefined });
 
   const { raw, db } = getDbHandle();
   let settled = false;

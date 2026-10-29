@@ -29,6 +29,8 @@ export const SubmitProofSchema = z.object({
   /** Simulation: the value the demo source reports for the rule's metric. Live: ignored; the SDK fetches it. */
   value: z.number().finite().optional(),
   actor: z.string().max(80).optional(),
+  /** Live: the attestation object returned by the Primus browser SDK (`startAttestation`). Shape checked in the provider. */
+  attestation: z.record(z.string(), z.unknown()).optional(),
 });
 
 export const DisputeSchema = z.object({ note: z.string().trim().min(3, "Say what is wrong.").max(500) });
