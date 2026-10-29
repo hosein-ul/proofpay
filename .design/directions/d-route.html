@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ProofPay — D · Route</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#ECEFF2;--surface:#FFFFFF;--sunk:#E1E5EA;--ink:#0F141B;--ink-2:#434C58;--ink-3:#79838F;--line:rgba(15,20,27,.1);--line-2:rgba(15,20,27,.24);
+--acc:#0B8F52;--acc-ink:#FFFFFF;--acc-soft:#DAF0E5;--ok:#0A7A49;--ok-bg:#DAF0E5;--warn:#9B5B05;--warn-bg:#FBEACB;--bad:#C0352A;--bad-bg:#FADFDB;--info:#1B5DB4;--info-bg:#DEE9F8;
+--refund:#E39A0E;--dispute:#D23A2E;--sans:'Barlow',ui-sans-serif,system-ui,sans-serif;--cond:'Barlow Condensed','Barlow',sans-serif;
+--r1:4px;--r2:6px;--r3:10px;--shadow:0 1px 2px rgba(15,20,27,.06),0 18px 40px -20px rgba(15,20,27,.25);--shadow-s:0 1px 2px rgba(15,20,27,.12)}
+:root[data-theme="dark"]{--bg:#0D1115;--surface:#141A20;--sunk:#0A0D10;--ink:#EEF1F4;--ink-2:#A6AFBA;--ink-3:#6C7683;--line:rgba(238,241,244,.09);--line-2:rgba(238,241,244,.22);
+--acc:#38D087;--acc-ink:#04170D;--acc-soft:rgba(56,208,135,.14);--ok:#4FD99A;--ok-bg:rgba(79,217,154,.13);--warn:#F0B454;--warn-bg:rgba(240,180,84,.13);--bad:#FF867B;--bad-bg:rgba(255,134,123,.13);--info:#7DB2F5;--info-bg:rgba(125,178,245,.13);
+--refund:#F0B454;--dispute:#FF6F62;--shadow:0 0 0 1px rgba(255,255,255,.05),0 30px 60px -30px rgba(0,0,0,.8);--shadow-s:0 0 0 1px rgba(255,255,255,.06)}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.num{font-variant-numeric:tabular-nums}
+.wrap{max-width:1240px;margin:0 auto;padding:0 32px;position:relative}
+.sp{flex:1}
+.nav{display:flex;align-items:center;height:72px;gap:30px;position:relative;z-index:3}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:19px;letter-spacing:-.02em}
+.nav ul{display:flex;gap:24px;list-style:none;margin:0;padding:0;color:var(--ink-2);font-size:14px}
+.nav ul li{cursor:pointer;transition:color .15s}.nav ul li:hover{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:42px;padding:0 20px;border-radius:var(--r1);border:1px solid var(--line-2);background:var(--surface);color:var(--ink);font:600 14px var(--sans);cursor:pointer;transition:transform .15s,background .15s,box-shadow .15s}
+.btn:hover{background:var(--sunk)}.btn:active{transform:translateY(1px)}
+.btn:focus-visible,.seg button:focus-visible,.cx:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+.btn.pri{background:var(--acc);border-color:transparent;color:var(--acc-ink)}
+.btn.pri:hover{filter:brightness(1.08);background:var(--acc)}
+.btn.sm{height:34px;padding:0 14px;font-size:13px}
+.btn.ghost{background:transparent;border-color:transparent}
+.cta{display:flex;gap:10px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 9px;border-radius:6px;font:600 12px var(--sans);white-space:nowrap}
+.chip i{width:6px;height:6px;border-radius:50%;background:currentColor}
+.c-ok{color:var(--ok);background:var(--ok-bg)}.c-warn{color:var(--warn);background:var(--warn-bg)}.c-bad{color:var(--bad);background:var(--bad-bg)}.c-info{color:var(--info);background:var(--info-bg)}.c-mute{color:var(--ink-2);background:var(--sunk)}
+.sim{display:inline-flex;align-items:center;gap:7px;height:24px;padding:0 10px;border-radius:999px;font:600 11.5px var(--sans);color:var(--ink-2);border:1px dashed var(--ink-3);white-space:nowrap}
+.seg{display:inline-flex;padding:3px;border-radius:var(--r1);background:var(--sunk);border:1px solid var(--line)}
+.seg button{all:unset;cursor:pointer;padding:5px 12px;border-radius:calc(var(--r1) - 2px);font:600 12px var(--sans);color:var(--ink-2);transition:all .15s}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow-s)}
+section.sec{padding:96px 0 0}
+.sh{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.9fr);gap:48px;align-items:end;margin-bottom:36px}
+h2{font:700 clamp(30px,3.8vw,54px)/1.04 var(--sans);letter-spacing:-.035em;margin:0;max-width:17ch;text-wrap:balance}
+.sh p{margin:0;color:var(--ink-2);font-size:16.5px;max-width:52ch}
+.dim{color:var(--ink-3)}
+/* ── overview (shared structure, restyled per direction) ───────── */
+.win{display:grid;grid-template-columns:200px minmax(0,1fr);border:1px solid var(--line);border-radius:var(--r3);background:var(--bg);box-shadow:var(--shadow);overflow:hidden;font-size:13px}
+.ov-nav{display:flex;flex-direction:column;gap:2px;padding:16px 12px;background:var(--surface);border-right:1px solid var(--line)}
+.ov-ws{display:flex;align-items:center;gap:10px;padding:4px 8px 14px;margin-bottom:6px;border-bottom:1px solid var(--line);font-weight:600}
+.ov-ws small{display:block;font-weight:400;color:var(--ink-3);font-size:11.5px;line-height:1.2}
+.nv{display:flex;align-items:center;gap:10px;height:32px;padding:0 10px;border-radius:var(--r1);color:var(--ink-2);cursor:pointer;transition:background .15s}
+.nv:hover{background:var(--sunk)}
+.nv svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.nv.on{background:var(--acc-soft);color:var(--ink);font-weight:600}
+.nv .ct{margin-left:auto;font-size:11px;color:var(--ink-3)}
+.ov-nav .gap{flex:1}
+.ov-main{min-width:0;display:flex;flex-direction:column}
+.ov-top{display:flex;align-items:center;gap:12px;height:54px;padding:0 22px;border-bottom:1px solid var(--line);background:var(--surface)}
+.crumb{color:var(--ink-3)}.crumb b{color:var(--ink);font-weight:600}
+.search{display:flex;align-items:center;gap:8px;height:30px;border:1px solid var(--line-2);border-radius:var(--r1);padding:0 8px 0 10px;color:var(--ink-3);min-width:230px}
+.search svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.7}
+.search kbd{margin-left:auto;font:600 11px var(--sans);border:1px solid var(--line-2);border-radius:4px;padding:0 5px;color:var(--ink-2)}
+.ov-body{padding:22px;display:grid;gap:18px}
+.ov-ph{display:flex;align-items:flex-end;gap:14px}
+.ov-ph h3{font:700 26px/1 var(--sans);letter-spacing:-.035em;margin:0}
+.ov-ph p{margin:6px 0 0;color:var(--ink-3)}
+.ov-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.kpi{padding:14px 16px 12px;min-width:0;border-radius:var(--r2);background:var(--surface);border:1px solid var(--line)}
+.kpi small{color:var(--ink-3);font-size:12px;font-weight:500}
+.kpi strong{display:block;font:700 25px/1.1 var(--sans);letter-spacing:-.035em;margin:7px 0 3px;font-variant-numeric:tabular-nums}
+.kpi strong span{color:var(--ink-3);font-weight:500}
+.kpi .d{font-size:12px;color:var(--ok);font-weight:600}
+.spark{height:24px;margin-top:8px;display:flex;align-items:flex-end;gap:3px}
+.spark svg{width:100%;height:100%;display:block}
+.spark i{flex:1;background:var(--acc);opacity:.35;border-radius:2px;min-height:3px}.spark i:last-child{opacity:1}
+.ov-cols{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:14px}
+.ov-pane{border-radius:var(--r2);background:var(--surface);border:1px solid var(--line);padding:16px;min-width:0}
+.ov-pane h4{margin:0 0 12px;font:700 13px var(--sans);display:flex;align-items:center;gap:8px}
+.ov-pane h4 small{margin-left:auto;font-weight:400;color:var(--ink-3);font-size:12px}
+.ov-pane h4+div+h4{margin-top:18px}
+.ch svg{width:100%;height:200px;display:block;overflow:visible}
+.ch text{font:400 11px var(--sans);fill:var(--ink-3);font-variant-numeric:tabular-nums}
+.att,.fi{display:flex;gap:10px;align-items:flex-start;padding:9px 0}
+.att+.att,.fi+.fi{border-top:1px solid var(--line)}
+.att b,.fi b{font-weight:600;display:block;line-height:1.3}
+.att small,.fi small{color:var(--ink-3);font-size:12px}
+.tscroll{overflow-x:auto}
+.tscroll table{width:100%;border-collapse:collapse;min-width:640px}
+.tscroll th{text-align:left;font-weight:500;color:var(--ink-3);font-size:12px;padding:0 12px 9px;border-bottom:1px solid var(--line-2);white-space:nowrap}
+.tscroll th.r,.tscroll td.r{text-align:right}
+.tscroll td{height:42px;padding:0 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tscroll tbody tr{transition:background .12s}.tscroll tbody tr:hover{background:var(--sunk)}
+.tscroll tbody tr:last-child td{border-bottom:0}
+.idn{display:inline-block;width:20px;height:20px;border-radius:50%;vertical-align:-5px;margin-right:8px}
+.hash{color:var(--ink-3);letter-spacing:.01em}
+/* ── trust model ───────────────────────────────────────────── */
+.tm{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.tm>div{padding:28px 30px;border-radius:var(--r3);background:var(--surface);border:1px solid var(--line)}
+.tm h3{margin:0 0 4px;font:700 22px var(--sans);letter-spacing:-.025em}
+.tm ul{list-style:none;margin:16px 0 0;padding:0}
+.tm li{display:grid;grid-template-columns:24px 1fr;gap:10px;padding:12px 0;border-top:1px solid var(--line);color:var(--ink-2);font-size:14.5px}
+.tm li b{color:var(--ink);font-weight:600}
+.tm svg{width:16px;height:16px;margin-top:3px}
+.tm .yes svg{color:var(--ok)}.tm .no svg{color:var(--bad)}
+/* ── specimen ──────────────────────────────────────────────── */
+.spec{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:start}
+.spec>div{grid-column:span 4;min-width:0}.spec .w8{grid-column:span 8}
+.lab{display:block;color:var(--ink-3);font-size:12.5px;margin-bottom:12px;font-weight:500}
+.roles{display:grid;grid-template-columns:repeat(var(--n,5),1fr);border-radius:var(--r1);overflow:hidden;border:1px solid var(--line)}
+.roles i{display:block;height:84px;padding:8px;font:600 11px var(--sans);font-style:normal}
+.row-c{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.field{display:flex;align-items:center;height:42px;min-width:220px;padding:0 14px;border-radius:var(--r1);border:1px solid var(--line-2);background:var(--surface);color:var(--ink-3);transition:box-shadow .15s}
+.field:focus-within{outline:2px solid var(--acc);outline-offset:2px}
+.field input{all:unset;flex:1;color:var(--ink)}
+footer{padding:84px 0 110px;color:var(--ink-3);font-size:13px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;position:relative}
+.themebar{position:fixed;right:16px;bottom:16px;z-index:90;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line-2);border-radius:12px;padding:6px 8px 6px 14px;font:600 12px var(--sans);color:var(--ink-2);box-shadow:var(--shadow)}
+@media(max-width:1000px){.sh{grid-template-columns:1fr;gap:16px}.tm{grid-template-columns:1fr}.spec>div,.spec .w8{grid-column:span 12}.ov-cols{grid-template-columns:minmax(0,1fr)}.ov-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:820px){.wrap{padding:0 20px}.nav ul,.nav .btn:not(.pri){display:none}.win{grid-template-columns:minmax(0,1fr)}.ov-nav{display:none}.search{display:none}.ov-body{padding:14px}.ov-ph{flex-wrap:wrap}section.sec{padding-top:72px}}
+@media(max-width:520px){.roles{--n:3;grid-template-columns:repeat(3,1fr)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+
+.brand{font-family:var(--cond);font-weight:700;font-size:25px;letter-spacing:-.005em}
+.btn{font-weight:600;letter-spacing:.005em;text-transform:none}
+.hero{padding:28px 0 0}
+.d-head{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:56px;align-items:end;margin-bottom:34px}
+.linechip{display:inline-flex;align-items:center;gap:10px;font:600 14px var(--sans);color:var(--ink-2)}
+.rd{width:26px;height:26px;border-radius:50%;background:var(--acc);color:var(--acc-ink);display:grid;place-items:center;font:700 14px var(--cond)}
+h1{font:700 clamp(54px,8vw,124px)/.88 var(--cond);letter-spacing:-.01em;margin:16px 0 0;text-transform:none}
+h1 em{font-style:normal;color:var(--acc)}
+.lede{font-size:18px;color:var(--ink-2);margin:0 0 22px;max-width:44ch}
+.attr{margin:18px 0 0;font-size:13px;color:var(--ink-3);max-width:46ch}.attr a{border-bottom:1px solid var(--line-2)}
+.map{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r3);box-shadow:var(--shadow);overflow:hidden}
+.mbar{display:flex;align-items:center;gap:14px;background:var(--ink);color:var(--bg);padding:11px 20px;font:600 14px var(--sans)}
+:root[data-theme="dark"] .mbar{background:#212A33;color:var(--ink)}
+.mbar .rd{width:22px;height:22px;font-size:12px}
+.mbar .next{font:600 15px var(--cond);letter-spacing:.02em;display:flex;gap:10px;align-items:center}
+.mbar .sim{color:var(--bg);border-color:rgba(255,255,255,.5)}
+:root[data-theme="dark"] .mbar .sim{color:var(--ink)}
+.msvg{display:block;width:100%;height:auto;padding:10px 12px 0}
+.msvg .main{stroke:var(--acc);stroke-width:14;fill:none;stroke-linecap:round}
+.msvg .br{fill:none;stroke-width:9;stroke-linecap:round;stroke-linejoin:round}
+.msvg .refund{stroke:var(--refund);stroke-dasharray:1 17;stroke-width:9}
+.msvg .refund.solid{stroke-dasharray:none;opacity:.22}
+.msvg .disp{stroke:var(--dispute);opacity:.28}
+.msvg .st{fill:var(--surface);stroke:var(--ink);stroke-width:5;transition:fill .25s steps(2,end)}
+.msvg .st.done{fill:var(--ink)}
+.msvg .st.cur{stroke:var(--acc);fill:var(--surface);stroke-width:7}
+.msvg .bst{fill:var(--surface);stroke:var(--ink-3);stroke-width:4}
+.msvg .term{fill:var(--ink-3)}
+.msvg .nm{font:700 26px var(--cond);fill:var(--ink);letter-spacing:.005em}
+.msvg .nm.sm{font-size:21px;fill:var(--ink-2)}
+.msvg .ds{font:500 14.5px var(--sans);fill:var(--ink-3)}
+.msvg .tag{font:700 13px var(--sans);letter-spacing:.06em;text-transform:uppercase}
+.msvg .pay{opacity:0;transition:opacity .3s}.msvg .pay.show{opacity:1}
+.msvg .train rect{fill:var(--ink)}.msvg .train text{font:700 13px var(--sans);fill:var(--surface);letter-spacing:.04em}
+.mleg{display:flex;gap:24px;flex-wrap:wrap;padding:12px 20px 14px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}
+.mleg span{display:inline-flex;align-items:center;gap:8px}
+.mleg i{width:26px;height:6px;border-radius:3px;display:block}
+/* how: vertical line diagram + timetable */
+.how{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:48px;align-items:start}
+.lined{position:relative;padding-left:56px}
+.lined::before{content:"";position:absolute;left:19px;top:14px;bottom:30px;width:12px;border-radius:6px;background:var(--acc)}
+.stop{position:relative;padding:0 0 34px}
+.stop:last-child{padding-bottom:0}
+.stop::before{content:"";position:absolute;left:-46px;top:4px;width:26px;height:26px;border-radius:50%;background:var(--surface);border:5px solid var(--ink);z-index:1}
+.stop h3{margin:0 0 4px;font:700 28px/1.1 var(--cond)}
+.stop p{margin:0;color:var(--ink-2);max-width:46ch}
+.stop .tg{display:inline-block;margin-top:8px;font:600 12.5px var(--sans);color:var(--ink-3);padding:2px 8px;border:1px solid var(--line-2);border-radius:3px}
+.tt{border:1px solid var(--line-2);border-radius:var(--r3);overflow:hidden;background:var(--surface);box-shadow:var(--shadow)}
+.tt h4{margin:0;padding:12px 18px;background:var(--ink);color:var(--bg);font:700 18px var(--cond);letter-spacing:.02em}
+:root[data-theme="dark"] .tt h4{background:#212A33;color:var(--ink)}
+.tt table{width:100%;border-collapse:collapse;font-size:14px}
+.tt th{text-align:left;font:600 12px var(--sans);color:var(--ink-3);padding:10px 18px 6px;border-bottom:1px solid var(--line-2)}
+.tt td{padding:10px 18px;border-bottom:1px solid var(--line)}
+.tt tr:last-child td{border-bottom:0}
+.tt td:first-child{font:700 18px var(--cond)}
+.tt .ex td{color:var(--ink-3)}
+/* app: dark rail, stepped chart, feed as stations */
+.ov-nav{background:#10161C;border-right:0;color:#E9EDF1}
+:root[data-theme="dark"] .ov-nav{background:#0A0D10}
+.ov-nav .nv{color:#A9B3BF}.ov-nav .nv:hover{background:rgba(255,255,255,.07)}
+.ov-nav .nv.on{background:rgba(255,255,255,.08);color:#fff;box-shadow:inset 3px 0 0 var(--acc);border-radius:0 4px 4px 0}
+.ov-ws{border-color:rgba(255,255,255,.12);color:#fff;font-family:var(--cond);font-size:16px}
+.ov-ws small{color:#8693A1}
+.ov-ph h3{font:700 36px/1 var(--cond);letter-spacing:0}
+.kpi{border-radius:var(--r2);border-top:4px solid var(--ink)}
+.kpi:nth-child(1){border-top-color:var(--acc)}.kpi:nth-child(5){border-top-color:var(--info)}
+.kpi strong{font:700 34px/1 var(--cond);letter-spacing:0}
+.ov-pane{border-radius:var(--r2)}
+.ov-pane h4{font:700 17px var(--cond);letter-spacing:.01em}
+.fi{position:relative;padding-left:26px}
+.fi:first-child::after,.fi::after{content:"";position:absolute;left:5px;top:0;bottom:0;width:5px;background:var(--acc)}
+.fi:first-child::after{top:14px}.fi:last-child::after{bottom:calc(100% - 14px)}
+.fi::before{content:"";position:absolute;left:0;top:11px;width:15px;height:15px;border-radius:50%;background:var(--surface);border:4px solid var(--ink);z-index:1}
+.fi .chip{order:2}
+.fi{flex-direction:column;gap:2px}
+.att{border-left:5px solid var(--warn);padding-left:12px;margin-bottom:8px;background:var(--sunk);border-radius:0 var(--r1) var(--r1) 0;border-top:0!important}
+.att:nth-child(2){border-left-color:var(--bad)}
+.chip{border-radius:3px;font-weight:700;letter-spacing:.01em}
+.chip i{border-radius:1px}
+.tscroll th{font:600 12.5px var(--sans);border-bottom:2px solid var(--ink)}
+.tscroll tbody tr:hover td:first-child{box-shadow:inset 4px 0 0 var(--acc)}
+.tm>div{border-top:6px solid var(--acc)}.tm .no{border-top-color:var(--dispute)}
+.tm h3{font:700 30px var(--cond)}
+.big{font:700 76px/.9 var(--cond)}
+h2{font-family:var(--cond);font-weight:700;letter-spacing:-.005em;font-size:clamp(38px,4.6vw,66px);line-height:.95}
+@media(max-width:1000px){.d-head,.how{grid-template-columns:1fr;gap:28px}}
+@media(max-width:560px){.mleg{gap:10px 18px}.mbar .next{display:none}.big{font-size:48px}.msvg .nm{font-size:30px}.msvg .ds{font-size:17px}}
+
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="i-check" viewBox="0 0 16 16"><path d="M3 8.500l3.200 3.200L13 4.800" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-x" viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+<symbol id="i-clock" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8 4.500V8l2.400 1.400" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+<symbol id="i-alert" viewBox="0 0 16 16"><path d="M8 2.500l6 10.500H2z M8 6.800v3 M8 11.500v.1" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+</svg>
+
+<div class="wrap">
+<header class="nav"><a class="brand" href="#"><svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="11" fill="none" stroke="var(--acc)" stroke-width="4.5"/><rect x="1" y="11.2" width="26" height="5.6" rx="1" fill="var(--ink)"/></svg><span>ProofPay</span></a>
+<ul><li>Product</li><li>Use cases</li><li>Security</li><li>Developers</li><li>Changelog</li></ul><span class="sp"></span>
+<a class="btn ghost sm" href="#">Try the demo</a><a class="btn pri sm" href="#">Request access</a></header>
+<main class="hero">
+<div class="d-head"><div><span class="linechip"><span class="rd">1</span>Line 1 · Payment · Testnet beta</span><h1>Pay when<br>it’s <em>proven.</em></h1></div>
+<div><p class="lede">Funds ride the line from Draft to Settled. They only get off at a station when the proof says so. Wrong turn? Refund and dispute lines are built in.</p><div class="cta"><a class="btn pri" href="#">Request access</a><a class="btn" href="#">Try a settlement</a></div><p class="attr">Proofs by <a href="https://docs.primuslabs.xyz" rel="noopener">Primus zkTLS</a>. A proof shows the source returned this response, not that its data is true.</p></div></div>
+<div class="map"><div class="mbar"><span class="rd">1</span><span>Settlement line</span><span class="next" id="next">Next stop · Funded</span><span class="sp"></span><span class="sim">Simulation · synthetic proof</span></div>
+<svg class="msvg" id="msvg" viewBox="0 0 1200 350" role="img" aria-label="Route map of a task: Draft, Funded, Awaiting proof, Proving, Verified, Settled, with refund and dispute branches"></svg>
+<div class="mleg"><span><i style="background:var(--acc)"></i>Line 1 · Payment</span><span><i style="background:repeating-linear-gradient(90deg,var(--refund) 0 5px,transparent 5px 11px)"></i>Line 2 · Expiry and refund</span><span><i style="background:var(--dispute);opacity:.5"></i>Line 3 · Dispute</span><span class="sp"></span><span class="dim">Task tsk_7Q2M · release 2,500.00 USDC when conversions ≥ 120</span></div></div>
+</main>
+<section class="sec">
+<div class="sh"><h2>Four stops<br>you can read.</h2><p>Define, lock, prove, settle. The state names are the same in the contract, the API, the database and this map.</p></div>
+<div class="how"><div class="lined">
+<div class="stop"><h3>Define</h3><p>Pick a source, a metric and a threshold. The rule is hashed into the task, so the worker cannot prove a different one.</p><span class="tg">Draft</span></div>
+<div class="stop"><h3>Lock</h3><p>Fund the escrow. Money waits at Funded until a proof lands or the deadline passes.</p><span class="tg">Funded · Awaiting proof</span></div>
+<div class="stop"><h3>Prove</h3><p>The worker attests the source response. Only the threshold result is disclosed.</p><span class="tg">Proving · Verified</span></div>
+<div class="stop"><h3>Settle</h3><p>The escrow checks signature, task binding, replay and window, then releases.</p><span class="tg">Settled</span></div></div>
+<div class="tt"><h4>Timetable · who moves the task</h4><table><thead><tr><th>State</th><th>Actor</th><th>Evidence</th></tr></thead><tbody>
+<tr><td>Draft</td><td>Payer</td><td>Condition hash</td></tr><tr><td>Funded</td><td>Payer</td><td>Deposit tx</td></tr><tr><td>Awaiting proof</td><td>Worker</td><td>—</td></tr><tr><td>Proving</td><td>Worker</td><td>Attestation</td></tr><tr><td>Verified</td><td>Verifier</td><td>Signature check</td></tr><tr><td>Settled</td><td>Escrow</td><td>Release tx</td></tr>
+<tr class="ex"><td>Expired → Refunded</td><td>Payer</td><td>Refund tx</td></tr><tr class="ex"><td>Disputed → Resolved</td><td>Arbiter</td><td>Resolution tx</td></tr></tbody></table></div></div>
+</section>
+<section class="sec">
+<div class="sh"><h2>The control room,<br>one screen.</h2><p>Every state change is an event with an actor, a time and a transaction. Demo data, labelled as such.</p></div>
+<div class="win" role="img" aria-label="ProofPay overview screen, demo data">
+<aside class="ov-nav"><div class="ov-ws"><svg width="22" height="22" viewBox="0 0 28 28"><circle cx="14" cy="14" r="11" fill="none" stroke="var(--acc)" stroke-width="4.5"/><rect x="1" y="11.2" width="26" height="5.6" rx="1" fill="#fff"/></svg><div>Northgate Growth<small>Workspace · demo</small></div></div>
+<a class="nv on"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="5"/><rect x="9" y="2" width="5" height="5"/><rect x="2" y="9" width="5" height="5"/><rect x="9" y="9" width="5" height="5"/></svg>Overview</a><a class="nv"><svg viewBox="0 0 16 16"><path d="M2 4h12M2 8h12M2 12h8"/></svg>Tasks<span class="ct num">26</span></a><a class="nv"><svg viewBox="0 0 16 16"><path d="M8 1.5l5.5 2v4.2c0 3-2.3 5.3-5.5 6.8C4.8 13 2.5 10.700 2.500 7.700V3.500z"/></svg>Proofs</a><a class="nv"><svg viewBox="0 0 16 16"><path d="M2 3h12M2 7h12M2 11h7M12 10v4M10 12h4"/></svg>Ledger</a><a class="nv"><svg viewBox="0 0 16 16"><circle cx="8" cy="5.5" r="2.5"/><path d="M3 13.500c.5-2.500 2.500-3.800 5-3.800s4.500 1.300 5 3.800"/></svg>Workers<span class="ct num">7</span></a><span class="gap"></span><a class="nv"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.200"/><path d="M8 1.500v2M8 12.500v2M1.500 8h2M12.500 8h2"/></svg>Settings</a></aside>
+<div class="ov-main"><div class="ov-top"><span class="crumb">Northgate Growth <b>/ Overview</b></span><span class="sp"></span>
+<div class="search"><svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.500 10.500L14 14"/></svg>Search tasks, workers, hashes<kbd>⌘K</kbd></div><span class="sim">Simulation</span><span class="chip c-mute">Base Sepolia</span></div>
+<div class="ov-body"><div class="ov-ph"><div><h3>Overview</h3><p>Last 30 days · USDC · demo data</p></div><span class="sp"></span>
+<div class="seg" id="range" role="group" aria-label="Range"><button aria-pressed="false">7d</button><button aria-pressed="true">30d</button><button aria-pressed="false">90d</button></div><a class="btn pri sm" href="#">New task</a></div>
+<div class="ov-kpis" id="ovKpis"></div>
+<div class="ov-cols"><div class="ov-pane ov-chart"><h4>Settlement volume<small>Daily · USDC · demo</small></h4><div class="ch" id="ovChart" role="img" aria-label="Daily settlement volume, last 30 days, demo data"></div></div>
+<div class="ov-pane ov-side"><h4>Needs attention<small>3</small></h4><div id="ovAttn"></div><h4>Proof feed<small>Live</small></h4><div id="ovFeed"></div></div></div>
+<div class="ov-pane"><h4>Recent tasks<small>6 of 26</small></h4><div class="tscroll"><table><thead><tr><th>Status</th><th>Task</th><th>Worker</th><th class="r">Amount</th><th>Deadline</th><th>Tx</th></tr></thead><tbody id="ovBody"></tbody></table></div></div>
+</div></div></div>
+</section>
+<section class="sec">
+<div class="sh"><h2>What the signal says.<br>And what it can’t.</h2><p>A proof shows the source returned this response. It does not show the source is right, or that the worker did the work.</p></div>
+<div class="tm"><div class="yes"><h3>The proof guarantees</h3><span class="dim" style="font-size:13px">Checked on-chain by the escrow</span><ul>
+<li><svg><use href="#i-check"/></svg><span><b>The source returned this response</b>, over TLS, unmodified.</span></li>
+<li><svg><use href="#i-check"/></svg><span><b>A registered attestor signed it.</b> Checked against the contract’s list.</span></li>
+<li><svg><use href="#i-check"/></svg><span><b>It belongs to this task and payee.</b> Replays are rejected.</span></li></ul></div>
+<div class="no"><h3>It does not guarantee</h3><span class="dim" style="font-size:13px">Decide these before you fund</span><ul>
+<li><svg><use href="#i-x"/></svg><span><b>That the source is truthful.</b> A dashboard can be wrong.</span></li>
+<li><svg><use href="#i-x"/></svg><span><b>That the worker did the work.</b> Only that the source reports it.</span></li>
+<li><svg><use href="#i-x"/></svg><span><b>Anything in Simulation.</b> Simulated proofs are synthetic and labelled.</span></li></ul></div></div>
+</section>
+<section class="sec">
+<div class="sh"><h2>Direction D.<br>Route.</h2><p>Settlement as a transit line. Signage typography, three line colours that mean something, stepped motion like a train between stops. Light first. Wayfinding × cartographic.</p></div>
+<div class="spec">
+<div class="w8"><span class="lab">Type · Barlow Condensed for signage and figures, Barlow for text; tabular figures; no mono face</span><div class="big">Pay when it’s <span style="color:var(--acc)">proven.</span></div><p style="color:var(--ink-2);max-width:62ch;margin:16px 0 0">Task <span class="num">tsk_7Q2M</span> settled <span class="num">2,500.00</span> USDC to Ada. <span class="num">126,480.50 · 94.1% · 3h 12m</span>.</p></div>
+<div><span class="lab">Roles</span><div class="roles" style="--n:6"><i style="background:var(--bg);color:var(--ink)">ground</i><i style="background:var(--surface);color:var(--ink)">surface</i><i style="background:var(--ink);color:var(--bg)">ink</i><i style="background:var(--acc);color:var(--acc-ink)">payment</i><i style="background:var(--refund);color:#1c1200">refund</i><i style="background:var(--dispute);color:#fff">dispute</i></div></div>
+<div class="w8"><span class="lab">Controls</span><div class="row-c"><a class="btn pri">Fund escrow</a><a class="btn">Save draft</a><a class="btn ghost">Cancel</a><label class="field"><input placeholder="Search tasks" aria-label="Search"></label><span class="chip c-ok"><i></i>Settled</span><span class="chip c-info"><i></i>Proving</span><span class="chip c-warn"><i></i>Expiring</span><span class="chip c-bad"><i></i>Failed</span></div></div>
+<div><span class="lab">Motion · mechanical, stepped</span><p style="margin:0;color:var(--ink-2);font-size:14px">The marker moves between stops in 1.0 s ease-in-out and dwells 0.9 s at each station, which fills in. Hover and press feedback is 150 ms. Reduced motion shows the finished route.</p></div>
+</div>
+</section>
+<footer><span>Testnet beta. Simulation proofs are synthetic and labelled. Demo data only.</span><span>Proofs by Primus zkTLS · marks belong to their owners; no partnership implied.</span></footer>
+</div>
+<div class="themebar">D · Route<div class="seg" id="theme"><button data-t="light" aria-pressed="true">Light</button><button data-t="dark" aria-pressed="false">Dark</button></div></div>
+<script>window.PP_CFG={"spark":"line","chart":"step","noFill":true,"lw":2.4,"seed":3};</script>
+<script>
+(function(){
+  var root=document.documentElement,$=function(i){return document.getElementById(i)};
+  function setTheme(t){root.dataset.theme=t;document.querySelectorAll('#theme button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.t===t)});window.dispatchEvent(new Event('themechange'))}
+  document.querySelectorAll('#theme button').forEach(function(b){b.onclick=function(){setTheme(b.dataset.t)}});
+  var q=new URLSearchParams(location.search).get('theme');if(q)setTheme(q);
+  document.querySelectorAll('#range button').forEach(function(b){b.onclick=function(){document.querySelectorAll('#range button').forEach(function(x){x.setAttribute('aria-pressed',x===b)})}});
+  var CFG=window.PP_CFG||{};
+  var s=CFG.seed||7;function rnd(){s=(s*16807)%2147483647;return s/2147483647}
+  function series(n,base,vol){var a=[],v=base;for(var i=0;i<n;i++){v=Math.max(base*.3,v+(rnd()-.47)*vol+Math.sin(i/2.5)*vol*.28);a.push(v)}return a}
+  function pts(a,w,h,p,mn,mx){mn=mn===undefined?Math.min.apply(null,a):mn;mx=mx===undefined?Math.max.apply(null,a):mx;return a.map(function(v,i){return [i/(a.length-1)*w,h-p-(v-mn)/(mx-mn||1)*(h-p*2)]})}
+  function L(p){return p.map(function(c,i){return (i?'L':'M')+c[0].toFixed(1)+' '+c[1].toFixed(1)}).join('')}
+  function stepL(p){var d='M'+p[0][0].toFixed(1)+' '+p[0][1].toFixed(1);for(var i=1;i<p.length;i++){d+='H'+p[i][0].toFixed(1)+'V'+p[i][1].toFixed(1)}return d}
+  var K=[['Escrow balance','48,210','.00','+4.2%'],['Settled · 30d','126,480','.50','+11.8%'],['Open tasks','17','','+3'],['Proof success','94.1','%','+1.3 pts'],['Median time to settle','3h 12m','','−18 min']];
+  $('ovKpis').innerHTML=K.map(function(k){var a=series(20,50,12),sp='';
+    if(CFG.spark==='bars'){var mx=Math.max.apply(null,a);sp='<div class="spark" aria-hidden="true">'+a.slice(-14).map(function(v){return '<i style="height:'+Math.round(v/mx*100)+'%"></i>'}).join('')+'</div>'}
+    else if(CFG.spark!=='none'){var p=pts(a,100,24,3);sp='<div class="spark" aria-hidden="true"><svg viewBox="0 0 100 24" preserveAspectRatio="none"><path d="'+L(p)+'" fill="none" stroke="var(--acc)" stroke-width="1.4" vector-effect="non-scaling-stroke"/></svg></div>'}
+    return '<div class="kpi"><small>'+k[0]+'</small><strong>'+k[1]+'<span>'+k[2]+'</span></strong><div class="d">▲ '+k[3]+'</div>'+sp+'</div>'}).join('');
+  var d=series(30,52,16),W=640,H=200,pd=22,mxv=Math.max.apply(null,d)*1.1,g='';
+  [0,.33,.66,1].forEach(function(f){var y=pd+(H-2*pd)*f;g+='<line x1="0" x2="'+W+'" y1="'+y+'" y2="'+y+'" stroke="var(--line)" vector-effect="non-scaling-stroke"/>'});
+  var ch='';
+  if(CFG.chart==='bars'){var bw=W/d.length;ch=d.map(function(v,i){var h=(v/mxv)*(H-2*pd);return '<rect x="'+(i*bw+bw*.18).toFixed(1)+'" y="'+(H-pd-h).toFixed(1)+'" width="'+(bw*.64).toFixed(1)+'" height="'+h.toFixed(1)+'" rx="'+(CFG.barR||2)+'" fill="var(--acc)" opacity="'+(i===19?1:.4)+'"/>'}).join('')}
+  else{var p=pts(d,W-20,H,pd,0,mxv).map(function(c){return [c[0]+4,c[1]]}),line=CFG.chart==='step'?stepL(p):L(p),last=p[p.length-1];
+    ch='<defs><linearGradient id="ar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--acc)" stop-opacity=".22"/><stop offset="1" stop-color="var(--acc)" stop-opacity="0"/></linearGradient></defs>'+(CFG.noFill?'':'<path d="'+line+' L'+last[0]+' '+(H-pd)+' L'+p[0][0]+' '+(H-pd)+'Z" fill="url(#ar)"/>')+'<path d="'+line+'" fill="none" stroke="var(--acc)" stroke-width="'+(CFG.lw||1.8)+'" stroke-linejoin="round" vector-effect="non-scaling-stroke"/><circle cx="'+last[0]+'" cy="'+last[1]+'" r="4" fill="var(--surface)" stroke="var(--acc)" stroke-width="2" vector-effect="non-scaling-stroke"/>'}
+  $('ovChart').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">'+g+ch+'<text x="0" y="'+(H-4)+'">Oct 13</text><text x="'+(W-34)+'" y="'+(H-4)+'">Nov 11</text></svg>';
+  var ic={ok:'i-check',bad:'i-x',warn:'i-clock',info:'i-clock'};
+  function chip(c,t){return '<span class="chip '+c+'"><i></i>'+t+'</span>'}
+  $('ovAttn').innerHTML=[['c-warn','Expires 6h','Lead-gen batch 14','850.00 · Kestrel · agent'],['c-bad','Proof failed','Report delivery','640.00 · Okafor Studio · condition not met'],['c-warn','Disputed','Grant milestone 2','5,000.00 · Meridian DAO · awaiting arbiter']].map(function(a){return '<div class="att">'+chip(a[0],a[1])+'<div><b>'+a[2]+'</b><small>'+a[3]+'</small></div></div>'}).join('');
+  $('ovFeed').innerHTML=[['c-ok','Settled','Q4 growth campaign','2,500.00 → Ada · agent · 2 min ago'],['c-info','Verified','Uptime SLA · p95 ≤ 240 ms','1,200.00 · Pelle Nord · 9 min ago'],['c-warn','Proving','Lead-gen batch 14','850.00 · Kestrel · agent · 21 min ago']].map(function(a){return '<div class="fi">'+chip(a[0],a[1])+'<div><b>'+a[2]+'</b><small>'+a[3]+'</small></div></div>'}).join('');
+  var T=[['c-ok','Settled','Q4 growth campaign · conversions ≥ 120','Ada · agent','2,500.00','Nov 14','0x6be1…d91f','#6C86E8'],['c-info','Verified','Uptime SLA · p95 ≤ 240 ms','Pelle Nord','1,200.00','Nov 18','0xa21c…03be','#F0A98A'],['c-warn','Proving','Lead-gen batch 14 · leads ≥ 400','Kestrel · agent','850.00','Today 18:00','—','#62C9AB'],['c-info','Awaiting proof','Docs migration · pages = 212','Sable · agent','3,100.00','Nov 22','—','#E5C05C'],['c-warn','Disputed','Grant milestone 2 · repo merged','Meridian DAO','5,000.00','Nov 9','0x91ff…7a40','#A3B0C4'],['c-bad','Proof failed','Report delivery · rows ≥ 5,000','Okafor Studio','640.00','Nov 12','0x2d00…c1e8','#C98FD2']];
+  $('ovBody').innerHTML=T.map(function(t){return '<tr><td>'+chip(t[0],t[1])+'</td><td>'+t[2]+'</td><td><span class="idn" style="background:conic-gradient(from 20deg,'+t[7]+',rgba(128,128,128,.25),'+t[7]+')"></span>'+t[3]+'</td><td class="r num">'+t[4].replace(/(\.\d+)$/,'<span class="dim">$1</span>')+'</td><td class="dim">'+t[5]+'</td><td class="hash num">'+t[6]+'</td></tr>'}).join('');
+  window.PP={$:$,series:series,pts:pts,L:L,rnd:rnd,reduced:matchMedia('(prefers-reduced-motion: reduce)').matches};
+})();
+</script>
+<script>
+(function(){
+  var P=window.PP,svg=P.$('msvg'),X=[70,290,510,730,930,1130],Y=170;
+  var ST=[['Draft','Rule written','b'],['Funded','USDC locked','t'],['Awaiting proof','Worker is up','t'],['Proving','Attestation in flight','b'],['Verified','Checks pass','t'],['Settled','Paid out','b']];
+  var h='<path class="br refund solid" d="M510 170V300H700"/><path class="br refund" d="M510 170V300H700"/><path class="br disp" d="M730 170V62H1010"/><path class="main" d="M70 170H1130"/>';
+  ST.forEach(function(s,i){var x=X[i],top=s[2]==='t';
+    h+='<circle class="st" id="st'+i+'" cx="'+x+'" cy="'+Y+'" r="14"/>';
+    h+='<text class="nm" x="'+x+'" y="'+(top?Y-48:Y+50)+'" text-anchor="middle">'+s[0]+'</text><text class="ds" x="'+x+'" y="'+(top?Y-27:Y+71)+'" text-anchor="middle">'+s[1]+'</text>'});
+  h+='<circle class="bst" cx="510" cy="245" r="10"/><text class="nm sm" x="532" y="243">Expired</text><text class="ds" x="532" y="263">Deadline passed</text>';
+  h+='<rect class="term" x="690" y="290" width="20" height="20" rx="3"/><text class="nm sm" x="722" y="299">Refunded</text><text class="ds" x="722" y="319">Back to payer</text>';
+  h+='<circle class="bst" cx="730" cy="112" r="10"/><text class="nm sm" x="752" y="110">Disputed</text><text class="ds" x="752" y="130">Flagged</text>';
+  h+='<rect class="term" x="1000" y="52" width="20" height="20" rx="3"/><text class="nm sm" x="1032" y="61">Resolved</text><text class="ds" x="1032" y="81">Arbiter decides</text>';
+  h+='<text class="tag" x="296" y="224" fill="var(--refund)" style="display:none">Refund</text>';
+  h+='<g class="pay" id="pay"><rect x="1000" y="214" width="190" height="34" rx="4" fill="var(--acc)"/><text x="1095" y="236" text-anchor="middle" style="font:700 16px var(--sans);fill:var(--acc-ink)">+2,500.00 USDC</text></g>';
+  h+='<g class="train" id="train"><rect x="-37" y="-15" width="74" height="30" rx="6"/><text x="0" y="5" text-anchor="middle">USDC</text></g>';
+  svg.innerHTML=h;
+  var train=P.$('train'),next=P.$('next'),pay=P.$('pay');
+  function place(x){train.setAttribute('transform','translate('+x+','+Y+')')}
+  function mark(i){ST.forEach(function(s,j){var c=P.$('st'+j).classList;c.toggle('done',j<i);c.toggle('cur',j===i)});next.textContent=i<5?'Now at · '+ST[i][0]+'    Next · '+ST[i+1][0]:'Arrived · Settled';pay.classList.toggle('show',i===5)}
+  var ease=function(t){return t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2};
+  if(P.reduced){place(X[5]);mark(5);ST.forEach(function(s,j){P.$('st'+j).classList.add('done')});return}
+  var i=0,from=0,t0=0,state='dwell',tdw=0;place(X[0]);mark(0);
+  function tick(ts){
+    if(document.hidden){requestAnimationFrame(tick);return}
+    if(!t0)t0=ts;
+    var dt=ts-t0;
+    if(state==='dwell'){if(dt>(i===5?3200:900)){if(i===5){i=0;mark(0);place(X[0]);t0=ts;state='dwell';requestAnimationFrame(tick);return}from=X[i];state='move';t0=ts}}
+    else{var k=Math.min(1,dt/1000);place(from+(X[i+1]-from)*ease(k));if(k>=1){i++;mark(i);state='dwell';t0=ts}}
+    requestAnimationFrame(tick)}
+  requestAnimationFrame(tick);
+})();</script>
+</body>
+</html>

@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ProofPay — H · Section</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;500;700;800&family=Chivo+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#E6E8EB;--surface:#FAFBFC;--paper:#FAFBFC;--sunk:#EEF0F2;--ink:#171A1E;--ink-2:#4B525B;--ink-3:#868D97;--line:rgba(23,26,30,.14);--line-2:rgba(23,26,30,.5);
+--acc:#FF5A0A;--acc-ink:#140900;--acc-soft:#FFE5D6;--ok:#17744B;--ok-bg:transparent;--warn:#956008;--warn-bg:transparent;--bad:#BE3328;--bad-bg:transparent;--info:#1F55A8;--info-bg:transparent;
+--sans:'Chivo',ui-sans-serif,system-ui,sans-serif;--mono:'Chivo Mono',ui-monospace,monospace;--r1:0px;--r2:0px;--r3:0px;--shadow:0 1px 0 rgba(23,26,30,.08),0 24px 50px -26px rgba(23,26,30,.4);--shadow-s:0 1px 0 rgba(23,26,30,.2)}
+:root[data-theme="dark"]{--bg:#0F1113;--surface:#16191C;--paper:#16191C;--sunk:#1C2024;--ink:#E9ECEF;--ink-2:#A5ACB5;--ink-3:#6E7680;--line:rgba(233,236,239,.13);--line-2:rgba(233,236,239,.5);
+--acc:#FF6B24;--acc-ink:#140900;--acc-soft:rgba(255,107,36,.16);--ok:#4DD497;--ok-bg:transparent;--warn:#F0B550;--warn-bg:transparent;--bad:#FF8176;--bad-bg:transparent;--info:#7BAEF5;--info-bg:transparent;
+--shadow:0 0 0 1px rgba(255,255,255,.06),0 30px 60px -30px rgba(0,0,0,.9);--shadow-s:0 0 0 1px rgba(255,255,255,.1)}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.num{font-variant-numeric:tabular-nums}
+.wrap{max-width:1240px;margin:0 auto;padding:0 32px;position:relative}
+.sp{flex:1}
+.nav{display:flex;align-items:center;height:72px;gap:30px;position:relative;z-index:3}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:19px;letter-spacing:-.02em}
+.nav ul{display:flex;gap:24px;list-style:none;margin:0;padding:0;color:var(--ink-2);font-size:14px}
+.nav ul li{cursor:pointer;transition:color .15s}.nav ul li:hover{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:42px;padding:0 20px;border-radius:var(--r1);border:1px solid var(--line-2);background:var(--surface);color:var(--ink);font:600 14px var(--sans);cursor:pointer;transition:transform .15s,background .15s,box-shadow .15s}
+.btn:hover{background:var(--sunk)}.btn:active{transform:translateY(1px)}
+.btn:focus-visible,.seg button:focus-visible,.cx:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+.btn.pri{background:var(--acc);border-color:transparent;color:var(--acc-ink)}
+.btn.pri:hover{filter:brightness(1.08);background:var(--acc)}
+.btn.sm{height:34px;padding:0 14px;font-size:13px}
+.btn.ghost{background:transparent;border-color:transparent}
+.cta{display:flex;gap:10px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 9px;border-radius:6px;font:600 12px var(--sans);white-space:nowrap}
+.chip i{width:6px;height:6px;border-radius:50%;background:currentColor}
+.c-ok{color:var(--ok);background:var(--ok-bg)}.c-warn{color:var(--warn);background:var(--warn-bg)}.c-bad{color:var(--bad);background:var(--bad-bg)}.c-info{color:var(--info);background:var(--info-bg)}.c-mute{color:var(--ink-2);background:var(--sunk)}
+.sim{display:inline-flex;align-items:center;gap:7px;height:24px;padding:0 10px;border-radius:999px;font:600 11.5px var(--sans);color:var(--ink-2);border:1px dashed var(--ink-3);white-space:nowrap}
+.seg{display:inline-flex;padding:3px;border-radius:var(--r1);background:var(--sunk);border:1px solid var(--line)}
+.seg button{all:unset;cursor:pointer;padding:5px 12px;border-radius:calc(var(--r1) - 2px);font:600 12px var(--sans);color:var(--ink-2);transition:all .15s}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow-s)}
+section.sec{padding:96px 0 0}
+.sh{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.9fr);gap:48px;align-items:end;margin-bottom:36px}
+h2{font:700 clamp(30px,3.8vw,54px)/1.04 var(--sans);letter-spacing:-.035em;margin:0;max-width:17ch;text-wrap:balance}
+.sh p{margin:0;color:var(--ink-2);font-size:16.5px;max-width:52ch}
+.dim{color:var(--ink-3)}
+/* ── overview (shared structure, restyled per direction) ───────── */
+.win{display:grid;grid-template-columns:200px minmax(0,1fr);border:1px solid var(--line);border-radius:var(--r3);background:var(--bg);box-shadow:var(--shadow);overflow:hidden;font-size:13px}
+.ov-nav{display:flex;flex-direction:column;gap:2px;padding:16px 12px;background:var(--surface);border-right:1px solid var(--line)}
+.ov-ws{display:flex;align-items:center;gap:10px;padding:4px 8px 14px;margin-bottom:6px;border-bottom:1px solid var(--line);font-weight:600}
+.ov-ws small{display:block;font-weight:400;color:var(--ink-3);font-size:11.5px;line-height:1.2}
+.nv{display:flex;align-items:center;gap:10px;height:32px;padding:0 10px;border-radius:var(--r1);color:var(--ink-2);cursor:pointer;transition:background .15s}
+.nv:hover{background:var(--sunk)}
+.nv svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.nv.on{background:var(--acc-soft);color:var(--ink);font-weight:600}
+.nv .ct{margin-left:auto;font-size:11px;color:var(--ink-3)}
+.ov-nav .gap{flex:1}
+.ov-main{min-width:0;display:flex;flex-direction:column}
+.ov-top{display:flex;align-items:center;gap:12px;height:54px;padding:0 22px;border-bottom:1px solid var(--line);background:var(--surface)}
+.crumb{color:var(--ink-3)}.crumb b{color:var(--ink);font-weight:600}
+.search{display:flex;align-items:center;gap:8px;height:30px;border:1px solid var(--line-2);border-radius:var(--r1);padding:0 8px 0 10px;color:var(--ink-3);min-width:230px}
+.search svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.7}
+.search kbd{margin-left:auto;font:600 11px var(--sans);border:1px solid var(--line-2);border-radius:4px;padding:0 5px;color:var(--ink-2)}
+.ov-body{padding:22px;display:grid;gap:18px}
+.ov-ph{display:flex;align-items:flex-end;gap:14px}
+.ov-ph h3{font:700 26px/1 var(--sans);letter-spacing:-.035em;margin:0}
+.ov-ph p{margin:6px 0 0;color:var(--ink-3)}
+.ov-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.kpi{padding:14px 16px 12px;min-width:0;border-radius:var(--r2);background:var(--surface);border:1px solid var(--line)}
+.kpi small{color:var(--ink-3);font-size:12px;font-weight:500}
+.kpi strong{display:block;font:700 25px/1.1 var(--sans);letter-spacing:-.035em;margin:7px 0 3px;font-variant-numeric:tabular-nums}
+.kpi strong span{color:var(--ink-3);font-weight:500}
+.kpi .d{font-size:12px;color:var(--ok);font-weight:600}
+.spark{height:24px;margin-top:8px;display:flex;align-items:flex-end;gap:3px}
+.spark svg{width:100%;height:100%;display:block}
+.spark i{flex:1;background:var(--acc);opacity:.35;border-radius:2px;min-height:3px}.spark i:last-child{opacity:1}
+.ov-cols{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:14px}
+.ov-pane{border-radius:var(--r2);background:var(--surface);border:1px solid var(--line);padding:16px;min-width:0}
+.ov-pane h4{margin:0 0 12px;font:700 13px var(--sans);display:flex;align-items:center;gap:8px}
+.ov-pane h4 small{margin-left:auto;font-weight:400;color:var(--ink-3);font-size:12px}
+.ov-pane h4+div+h4{margin-top:18px}
+.ch svg{width:100%;height:200px;display:block;overflow:visible}
+.ch text{font:400 11px var(--sans);fill:var(--ink-3);font-variant-numeric:tabular-nums}
+.att,.fi{display:flex;gap:10px;align-items:flex-start;padding:9px 0}
+.att+.att,.fi+.fi{border-top:1px solid var(--line)}
+.att b,.fi b{font-weight:600;display:block;line-height:1.3}
+.att small,.fi small{color:var(--ink-3);font-size:12px}
+.tscroll{overflow-x:auto}
+.tscroll table{width:100%;border-collapse:collapse;min-width:640px}
+.tscroll th{text-align:left;font-weight:500;color:var(--ink-3);font-size:12px;padding:0 12px 9px;border-bottom:1px solid var(--line-2);white-space:nowrap}
+.tscroll th.r,.tscroll td.r{text-align:right}
+.tscroll td{height:42px;padding:0 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tscroll tbody tr{transition:background .12s}.tscroll tbody tr:hover{background:var(--sunk)}
+.tscroll tbody tr:last-child td{border-bottom:0}
+.idn{display:inline-block;width:20px;height:20px;border-radius:50%;vertical-align:-5px;margin-right:8px}
+.hash{color:var(--ink-3);letter-spacing:.01em}
+/* ── trust model ───────────────────────────────────────────── */
+.tm{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.tm>div{padding:28px 30px;border-radius:var(--r3);background:var(--surface);border:1px solid var(--line)}
+.tm h3{margin:0 0 4px;font:700 22px var(--sans);letter-spacing:-.025em}
+.tm ul{list-style:none;margin:16px 0 0;padding:0}
+.tm li{display:grid;grid-template-columns:24px 1fr;gap:10px;padding:12px 0;border-top:1px solid var(--line);color:var(--ink-2);font-size:14.5px}
+.tm li b{color:var(--ink);font-weight:600}
+.tm svg{width:16px;height:16px;margin-top:3px}
+.tm .yes svg{color:var(--ok)}.tm .no svg{color:var(--bad)}
+/* ── specimen ──────────────────────────────────────────────── */
+.spec{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:start}
+.spec>div{grid-column:span 4;min-width:0}.spec .w8{grid-column:span 8}
+.lab{display:block;color:var(--ink-3);font-size:12.5px;margin-bottom:12px;font-weight:500}
+.roles{display:grid;grid-template-columns:repeat(var(--n,5),1fr);border-radius:var(--r1);overflow:hidden;border:1px solid var(--line)}
+.roles i{display:block;height:84px;padding:8px;font:600 11px var(--sans);font-style:normal}
+.row-c{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.field{display:flex;align-items:center;height:42px;min-width:220px;padding:0 14px;border-radius:var(--r1);border:1px solid var(--line-2);background:var(--surface);color:var(--ink-3);transition:box-shadow .15s}
+.field:focus-within{outline:2px solid var(--acc);outline-offset:2px}
+.field input{all:unset;flex:1;color:var(--ink)}
+footer{padding:84px 0 110px;color:var(--ink-3);font-size:13px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;position:relative}
+.themebar{position:fixed;right:16px;bottom:16px;z-index:90;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line-2);border-radius:12px;padding:6px 8px 6px 14px;font:600 12px var(--sans);color:var(--ink-2);box-shadow:var(--shadow)}
+@media(max-width:1000px){.sh{grid-template-columns:1fr;gap:16px}.tm{grid-template-columns:1fr}.spec>div,.spec .w8{grid-column:span 12}.ov-cols{grid-template-columns:minmax(0,1fr)}.ov-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:820px){.wrap{padding:0 20px}.nav ul,.nav .btn:not(.pri){display:none}.win{grid-template-columns:minmax(0,1fr)}.ov-nav{display:none}.search{display:none}.ov-body{padding:14px}.ov-ph{flex-wrap:wrap}section.sec{padding-top:72px}}
+@media(max-width:520px){.roles{--n:3;grid-template-columns:repeat(3,1fr)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+
+body{background:var(--bg)}
+.brand{font-weight:800;letter-spacing:-.03em}
+.btn{border-radius:0;border:1.5px solid var(--ink);background:var(--surface);font-weight:700}
+.btn.pri{background:var(--acc);border-color:var(--ink);color:var(--acc-ink);box-shadow:3px 3px 0 var(--ink)}
+.btn.pri:hover{filter:none;transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}
+.btn.pri:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.btn.ghost{border-color:transparent}
+.hero{padding:26px 0 0}
+.h-top{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.8fr);gap:48px;align-items:end;margin-bottom:28px}
+.meta{font:500 12px var(--mono);color:var(--ink-3);letter-spacing:.06em;margin-bottom:14px}
+h1{font:800 clamp(48px,7.4vw,112px)/.9 var(--sans);letter-spacing:-.045em;margin:0}
+h1 em{font-style:normal;box-shadow:inset 0 -.16em 0 var(--acc)}
+.lede{font-size:17px;color:var(--ink-2);margin:0 0 20px;max-width:42ch}
+.attr{margin:16px 0 0;font-size:12.5px;color:var(--ink-3);max-width:44ch}.attr a{border-bottom:1px solid var(--line-2)}
+.sheet{position:relative;background:var(--paper);border:2px solid var(--ink);box-shadow:var(--shadow);padding:22px 22px 0}
+.sheet::before{content:"";position:absolute;inset:8px;border:1px solid var(--ink);pointer-events:none;opacity:.7}
+.zn{position:absolute;font:500 10.5px var(--mono);color:var(--ink-3)}
+.dsvg{display:block;width:100%;height:auto;position:relative}
+.dsvg text{font-family:var(--mono)}
+.dsvg .lt{font:600 13px var(--mono);letter-spacing:.12em;fill:var(--ink)}
+.dsvg .bn{font:700 13px var(--mono);fill:var(--ink)}
+.dsvg .dm{font:500 11.5px var(--mono);fill:var(--ink);letter-spacing:.08em}
+.dsvg .note{font:400 13.5px/1.4 var(--sans);color:var(--ink-2);padding-right:8px}
+.dsvg .note b{color:var(--ink);font-weight:700;font-family:var(--mono);font-size:11.5px;letter-spacing:.06em}
+.dsvg .ly .edge{transition:stroke .3s steps(2,end)}
+.dsvg .ly.on .edge{stroke:var(--acc);stroke-width:3.5}
+.dsvg .ly.on .bl{fill:var(--acc)}.dsvg .ly.on .bn{fill:var(--acc-ink)}
+.dsvg .fa{transition:stroke-dashoffset .6s steps(8,end)}.dsvg .fa.on{stroke-dashoffset:0!important}
+.dsvg .pay{opacity:0;transition:opacity .4s steps(3,end)}.dsvg .pay.on{opacity:1}
+.tbk{display:grid;grid-template-columns:repeat(12,1fr);border-top:2px solid var(--ink);margin:6px -22px 0;font-size:12.5px;position:relative}
+.tbk>div{padding:8px 12px 9px;border-left:1px solid var(--ink);border-bottom:1px solid var(--ink);min-width:0}
+.tbk>div:first-child{border-left:0}
+.tbk small{display:block;font:500 10px var(--mono);color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase}
+.tbk b{font-weight:700;display:block}
+.tbk .c3{grid-column:span 3}.tbk .c2{grid-column:span 2}.tbk .c4{grid-column:span 4}.tbk .c6{grid-column:span 6}.tbk .c1{grid-column:span 1}
+.tbk .big{font:800 22px/1.1 var(--sans);letter-spacing:-.02em}
+.stamp{display:inline-block;font:700 11px var(--mono);letter-spacing:.14em;color:var(--acc);border:1.5px solid var(--acc);padding:2px 8px;transform:none}
+/* how: schedule of parts */
+.parts{width:100%;border-collapse:collapse;border:2px solid var(--ink);background:var(--paper);box-shadow:var(--shadow)}
+.parts th{text-align:left;font:600 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:10px 16px;border-bottom:2px solid var(--ink);border-right:1px solid var(--ink);background:var(--sunk)}
+.parts td{padding:20px 16px;border-bottom:1px solid var(--ink);border-right:1px solid var(--ink);vertical-align:top;font-size:15px;color:var(--ink-2)}
+.parts tr:last-child td{border-bottom:0}.parts td:last-child,.parts th:last-child{border-right:0}
+.parts td:first-child{width:72px}.parts td b{font:800 30px/1 var(--sans);letter-spacing:-.03em;color:var(--ink);display:block}
+.bal{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--ink);font:700 13px var(--mono);background:var(--paper)}
+.parts .mono{font:500 12.5px var(--mono);color:var(--ink)}
+.hatchlegend{display:flex;gap:22px;flex-wrap:wrap;margin-top:14px;font:500 11.5px var(--mono);color:var(--ink-2)}
+.hatchlegend span{display:inline-flex;align-items:center;gap:8px}
+.hatchlegend svg{width:34px;height:16px;border:1px solid var(--ink)}
+/* app */
+.win{border:2px solid var(--ink);box-shadow:var(--shadow)}
+.ov-nav{border-right:2px solid var(--ink);background:var(--sunk)}
+.nv{font-family:var(--mono);font-size:12px;letter-spacing:.02em}
+.nv.on{background:var(--ink);color:var(--paper)}.nv.on .ct{color:var(--paper)}
+.ov-top{border-bottom:2px solid var(--ink);font-family:var(--mono);font-size:12px}
+.ov-ph h3{font:800 34px/1 var(--sans);letter-spacing:-.04em}
+.kpi{border:1px solid var(--ink);border-radius:0;background:var(--paper);margin-right:-1px}
+.ov-kpis{gap:0}
+.kpi small{font:500 10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.kpi strong{font:800 30px/1 var(--sans)}
+.ov-pane{border:1px solid var(--ink);border-radius:0}
+.ov-pane h4{font:600 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid var(--ink);padding-bottom:8px;margin:-2px 0 12px}
+.ov-pane h4+div+h4{margin-top:18px}
+.chip{border-radius:0;background:transparent!important;border:1.5px solid currentColor;font:700 10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;height:22px}
+.chip i{display:none}
+.c-mute{color:var(--ink-2)}
+.sim{border-radius:0;border:1.5px solid var(--acc);color:var(--acc);font:700 10.5px var(--mono);letter-spacing:.1em;text-transform:uppercase}
+.tscroll th{font:600 10.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;border-bottom:2px solid var(--ink)}
+.tscroll td{height:36px;border-bottom:1px solid var(--line-2);font-size:13px}
+.hash{font-family:var(--mono);font-size:12px}
+.tscroll tbody tr:hover{background:var(--acc-soft)}
+.idn{border-radius:0;width:14px;height:14px;vertical-align:-2px;background-image:none!important;border:1.5px solid var(--ink)}
+.search,.field{border-radius:0;border:1.5px solid var(--ink)}
+/* trust as general notes */
+.tm{counter-reset:note;gap:0;border:2px solid var(--ink);background:var(--paper);box-shadow:var(--shadow)}
+.tm>div{border:0;border-radius:0;padding:26px 28px}.tm>div+div{border-left:2px solid var(--ink);background:repeating-linear-gradient(135deg,transparent 0 9px,var(--line) 9px 10px)}
+.tm h3{font:600 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;margin-bottom:2px}
+.tm li{grid-template-columns:40px 1fr;counter-increment:note;border-top:1px solid var(--ink)}
+.tm li svg{display:none}.tm li::before{content:counter(note);width:26px;height:26px;border-radius:50%;border:1.5px solid var(--ink);display:grid;place-items:center;font:700 12px var(--mono);color:var(--ink)}
+.tm .yes{color:inherit}
+.big{font:800 76px/.9 var(--sans);letter-spacing:-.045em}
+h2{font-weight:800;letter-spacing:-.04em}
+.kick{font:500 12px var(--mono);letter-spacing:.08em;color:var(--ink-3)}
+@media(max-width:1000px){.h-top{grid-template-columns:1fr;gap:20px}.tbk{grid-template-columns:repeat(6,1fr)}.tbk .c6,.tbk .c4,.tbk .c3{grid-column:span 6}.tbk .c2,.tbk .c1{grid-column:span 3}.parts td:nth-child(3){display:none}.parts th:nth-child(3){display:none}}
+@media(max-width:700px){.dsvg{min-width:900px}.dwrap{overflow-x:auto;margin:0 -22px;padding:0 22px}.tm{grid-template-columns:1fr}.tm>div+div{border-left:0;border-top:2px solid var(--ink)}.big{font-size:46px}.ov-kpis{gap:0}}
+
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="i-check" viewBox="0 0 16 16"><path d="M3 8.500l3.200 3.200L13 4.800" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-x" viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+<symbol id="i-clock" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8 4.500V8l2.400 1.400" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+<symbol id="i-alert" viewBox="0 0 16 16"><path d="M8 2.500l6 10.500H2z M8 6.800v3 M8 11.500v.1" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+</svg>
+
+<div class="wrap">
+<header class="nav"><a class="brand" href="#"><svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="2.500" y="2.500" width="23" height="23" fill="none" stroke="var(--ink)" stroke-width="2"/><path d="M5 22L22 5M5 16L16 5M11 22L22 11M5 10L10 5M17 22L22 17" stroke="var(--ink)" stroke-width="1.200"/><path d="M2 14H26" stroke="var(--acc)" stroke-width="2.600"/></svg><span>ProofPay</span></a>
+<ul><li>Product</li><li>Use cases</li><li>Security</li><li>Developers</li><li>Changelog</li></ul><span class="sp"></span>
+<a class="btn ghost sm" href="#">Try the demo</a><a class="btn pri sm" href="#">Request access</a></header>
+<main class="hero">
+<div class="h-top"><div><div class="meta">DRAWING PP-001 · REV A · SECTION A–A · SCALE 1:1</div><h1>Pay when<br>it’s <em>proven.</em></h1></div>
+<div><p class="lede">Cut through a settlement and you find five layers. Funds only move when the proof passes through all of them, in order. Here is the section.</p><div class="cta"><a class="btn pri" href="#">Request access</a><a class="btn" href="#">Try a settlement</a></div><p class="attr">Proofs by <a href="https://docs.primuslabs.xyz" rel="noopener">Primus zkTLS</a>. A proof shows the source returned this response, not that its data is true.</p></div></div>
+<div class="sheet"><span class="zn" style="left:50%;top:-1px;transform:translate(-50%,-100%)">1 &nbsp; 2 &nbsp; 3 &nbsp; 4 &nbsp; 5 &nbsp; 6</span>
+<div class="dwrap"><svg class="dsvg" id="dwg" viewBox="0 0 1200 600" role="img" aria-label="Section drawing of a settlement: worker, source over TLS, attestor, verifier contract and escrow, with the flow of the proof marked in orange"><defs>
+<pattern id="hSparse" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="14" stroke="var(--ink)" stroke-width="1" opacity=".55"/></pattern>
+<pattern id="hCross" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V12M0 0H12" stroke="var(--ink)" stroke-width=".9" opacity=".55" fill="none"/></pattern>
+<pattern id="hDots" width="9" height="9" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.1" fill="var(--ink)" opacity=".6"/></pattern>
+<pattern id="hDense" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><line x1="0" y1="0" x2="0" y2="6" stroke="var(--ink)" stroke-width="1" opacity=".6"/></pattern>
+<pattern id="hSolid" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="var(--ink)" stroke-width="3.4" opacity=".92"/></pattern>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 1L10 5 0 9z" fill="var(--acc)"/></marker>
+<marker id="ad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 1L10 5 0 9z" fill="var(--ink)"/></marker>
+</defs><line x1="410" y1="18" x2="410" y2="510" stroke="var(--ink)" stroke-width="1" stroke-dasharray="14 4 2 4" opacity=".7"/><g class="ly" data-i="0"><rect x="190" y="44" width="440" height="62" fill="var(--paper)"/><rect x="190" y="44" width="440" height="62" fill="url(#hSparse)"/><rect class="edge" x="190" y="44" width="440" height="62" fill="none" stroke="var(--ink)" stroke-width="2"/><rect x="332" y="60" width="156" height="30" fill="var(--paper)" stroke="var(--ink)" stroke-width="1"/><text x="410" y="80" text-anchor="middle" class="lt">WORKER</text><line x1="630" y1="75" x2="682" y2="75" stroke="var(--ink)" stroke-width="1"/><circle class="bl" cx="696" cy="75" r="14" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.5"/><text x="696" y="80" text-anchor="middle" class="bn">1</text><foreignObject x="722" y="51" width="330" height="56"><div xmlns="http://www.w3.org/1999/xhtml" class="note"><b>WORKER.</b> Asks the source for its data through the attestor, as an ordinary HTTPS request.</div></foreignObject></g><line class="fa" data-i="0" x1="410" y1="108" x2="410" y2="134" stroke="var(--acc)" stroke-width="4" marker-end="url(#ah)" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><g class="ly" data-i="1"><rect x="190" y="136" width="440" height="62" fill="var(--paper)"/><rect x="190" y="136" width="440" height="62" fill="url(#hCross)"/><rect class="edge" x="190" y="136" width="440" height="62" fill="none" stroke="var(--ink)" stroke-width="2"/><rect x="332" y="152" width="156" height="30" fill="var(--paper)" stroke="var(--ink)" stroke-width="1"/><text x="410" y="172" text-anchor="middle" class="lt">SOURCE · TLS</text><line x1="630" y1="167" x2="682" y2="167" stroke="var(--ink)" stroke-width="1"/><circle class="bl" cx="696" cy="167" r="14" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.5"/><text x="696" y="172" text-anchor="middle" class="bn">2</text><foreignObject x="722" y="143" width="330" height="56"><div xmlns="http://www.w3.org/1999/xhtml" class="note"><b>SOURCE / TLS.</b> Answers over TLS. Private fields stay on the source page.</div></foreignObject></g><line class="fa" data-i="1" x1="410" y1="200" x2="410" y2="226" stroke="var(--acc)" stroke-width="4" marker-end="url(#ah)" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><g class="ly" data-i="2"><rect x="190" y="228" width="440" height="62" fill="var(--paper)"/><rect x="190" y="228" width="440" height="62" fill="url(#hDots)"/><rect class="edge" x="190" y="228" width="440" height="62" fill="none" stroke="var(--ink)" stroke-width="2"/><rect x="332" y="244" width="156" height="30" fill="var(--paper)" stroke="var(--ink)" stroke-width="1"/><text x="410" y="264" text-anchor="middle" class="lt">ATTESTOR</text><line x1="630" y1="259" x2="682" y2="259" stroke="var(--ink)" stroke-width="1"/><circle class="bl" cx="696" cy="259" r="14" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.5"/><text x="696" y="264" text-anchor="middle" class="bn">3</text><foreignObject x="722" y="235" width="330" height="56"><div xmlns="http://www.w3.org/1999/xhtml" class="note"><b>ATTESTOR.</b> Signs only the disclosed claim: the threshold was met.</div></foreignObject></g><line class="fa" data-i="2" x1="410" y1="292" x2="410" y2="318" stroke="var(--acc)" stroke-width="4" marker-end="url(#ah)" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><g class="ly" data-i="3"><rect x="190" y="320" width="440" height="62" fill="var(--paper)"/><rect x="190" y="320" width="440" height="62" fill="url(#hDense)"/><rect class="edge" x="190" y="320" width="440" height="62" fill="none" stroke="var(--ink)" stroke-width="2"/><rect x="332" y="336" width="156" height="30" fill="var(--paper)" stroke="var(--ink)" stroke-width="1"/><text x="410" y="356" text-anchor="middle" class="lt">VERIFIER</text><line x1="630" y1="351" x2="682" y2="351" stroke="var(--ink)" stroke-width="1"/><circle class="bl" cx="696" cy="351" r="14" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.5"/><text x="696" y="356" text-anchor="middle" class="bn">4</text><foreignObject x="722" y="327" width="330" height="56"><div xmlns="http://www.w3.org/1999/xhtml" class="note"><b>VERIFIER.</b> Contract checks signature, task binding, replay and time window.</div></foreignObject></g><line class="fa" data-i="3" x1="410" y1="384" x2="410" y2="410" stroke="var(--acc)" stroke-width="4" marker-end="url(#ah)" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><g class="ly" data-i="4"><rect x="190" y="412" width="440" height="80" fill="var(--paper)"/><rect x="190" y="412" width="440" height="80" fill="url(#hSolid)"/><rect class="edge" x="190" y="412" width="440" height="80" fill="none" stroke="var(--ink)" stroke-width="2"/><rect x="332" y="437" width="156" height="30" fill="var(--paper)" stroke="var(--ink)" stroke-width="1"/><text x="410" y="457" text-anchor="middle" class="lt">ESCROW</text><line x1="630" y1="452" x2="682" y2="452" stroke="var(--ink)" stroke-width="1"/><circle class="bl" cx="696" cy="452" r="14" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.5"/><text x="696" y="457" text-anchor="middle" class="bn">5</text><foreignObject x="722" y="428" width="330" height="56"><div xmlns="http://www.w3.org/1999/xhtml" class="note"><b>ESCROW.</b> Releases 2,500.00 USDC to the worker. Refund after the deadline.</div></foreignObject></g><line x1="150" y1="136" x2="150" y2="382" stroke="var(--ink)" stroke-width="1" marker-start="url(#ad)" marker-end="url(#ad)"/><line x1="140" y1="136" x2="186" y2="136" stroke="var(--ink)" stroke-width=".8"/><line x1="140" y1="382" x2="186" y2="382" stroke="var(--ink)" stroke-width=".8"/>
+<text transform="translate(136 259) rotate(-90)" text-anchor="middle" class="dm">WHAT THE PROOF COVERS</text><g class="pay"><line x1="190" y1="518" x2="630" y2="518" stroke="var(--acc)" stroke-width="1.6" marker-start="url(#ah)" marker-end="url(#ah)"/><line x1="190" y1="506" x2="190" y2="526" stroke="var(--acc)"/><line x1="630" y1="506" x2="630" y2="526" stroke="var(--acc)"/><rect x="282" y="506" width="256" height="24" fill="var(--paper)"/><text x="410" y="523" text-anchor="middle" class="dm" style="fill:var(--acc);font-weight:700;font-size:14px">2,500.00 USDC RELEASED</text></g><g class="dm"><text x="28" y="26" style="font-weight:700;font-size:16px">A</text><path d="M16 38H56" stroke="var(--ink)" stroke-width="2" marker-end="url(#ad)"/><text x="1160" y="26" style="font-weight:700;font-size:16px">A</text><path d="M1184 38H1144" stroke="var(--ink)" stroke-width="2" marker-end="url(#ad)"/></g></svg></div>
+<div class="tbk"><div class="c3"><small>Project</small><b class="big">ProofPay</b></div><div class="c3"><small>Drawing</small><b>Escrow release · section A–A</b></div><div class="c2"><small>Status</small><b>Testnet beta</b></div><div class="c2"><small>Mode</small><b><span class="stamp">Simulation</span></b></div><div class="c2"><small>Sheet</small><b>1 / 1</b></div>
+<div class="c3"><small>Task</small><b>tsk_7Q2M</b></div><div class="c3"><small>Rule</small><b>conversions ≥ 120</b></div><div class="c2"><small>Drawn</small><b>Worker</b></div><div class="c2"><small>Checked</small><b>Verifier</b></div><div class="c2"><small>Rev</small><b>A</b></div></div></div>
+<div class="hatchlegend"><span><svg><rect width="34" height="16" fill="url(#hSparse)"/></svg>Private to the worker</span><span><svg><rect width="34" height="16" fill="url(#hCross)"/></svg>Source data, private</span><span><svg><rect width="34" height="16" fill="url(#hDots)"/></svg>Signed claim</span><span><svg><rect width="34" height="16" fill="url(#hDense)"/></svg>On-chain check</span><span><svg><rect width="34" height="16" fill="url(#hSolid)"/></svg>Funds</span></div>
+</main>
+<section class="sec">
+<div class="sh"><h2>Schedule<br>of parts.</h2><p>Four steps, four parts. Each has one owner and one piece of evidence. The escrow only ever inspects parts 3 and 4.</p></div>
+<table class="parts"><thead><tr><th>Item</th><th>Part</th><th>Description</th><th>Evidence</th></tr></thead><tbody>
+<tr><td><span class="bal">1</span></td><td><b>Define</b></td><td>A source, a metric, a threshold, a date. The rule is hashed into the task, so the worker cannot prove a different one.</td><td class="mono">condition hash</td></tr>
+<tr><td><span class="bal">2</span></td><td><b>Lock</b></td><td>Fund the escrow. Money waits until a proof lands or the deadline passes.</td><td class="mono">deposit tx</td></tr>
+<tr><td><span class="bal">3</span></td><td><b>Prove</b></td><td>The worker attests the source response. Only the threshold result is disclosed.</td><td class="mono">attestation · signature</td></tr>
+<tr><td><span class="bal">4</span></td><td><b>Settle</b></td><td>Signature, task binding, replay and window are checked on-chain. Then the escrow releases.</td><td class="mono">release tx</td></tr></tbody></table>
+</section>
+<section class="sec">
+<div class="sh"><h2>The register.<br>Sheet 2 of 2.</h2><p>Every state change is an event with an actor, a time and a transaction. Demo data, labelled as such.</p></div>
+<div class="win" role="img" aria-label="ProofPay overview screen, demo data">
+<aside class="ov-nav"><div class="ov-ws"><svg width="22" height="22" viewBox="0 0 28 28"><rect x="2.500" y="2.500" width="23" height="23" fill="none" stroke="var(--ink)" stroke-width="2"/><path d="M5 22L22 5M5 16L16 5M11 22L22 11" stroke="var(--ink)" stroke-width="1.200"/><path d="M2 14H26" stroke="var(--acc)" stroke-width="2.600"/></svg><div>Northgate Growth<small>Workspace · demo</small></div></div>
+<a class="nv on"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="5"/><rect x="9" y="2" width="5" height="5"/><rect x="2" y="9" width="5" height="5"/><rect x="9" y="9" width="5" height="5"/></svg>Overview</a><a class="nv"><svg viewBox="0 0 16 16"><path d="M2 4h12M2 8h12M2 12h8"/></svg>Tasks<span class="ct num">26</span></a><a class="nv"><svg viewBox="0 0 16 16"><path d="M8 1.5l5.5 2v4.2c0 3-2.3 5.3-5.5 6.8C4.8 13 2.5 10.700 2.500 7.700V3.500z"/></svg>Proofs</a><a class="nv"><svg viewBox="0 0 16 16"><path d="M2 3h12M2 7h12M2 11h7M12 10v4M10 12h4"/></svg>Ledger</a><a class="nv"><svg viewBox="0 0 16 16"><circle cx="8" cy="5.5" r="2.5"/><path d="M3 13.500c.5-2.500 2.500-3.800 5-3.800s4.500 1.300 5 3.800"/></svg>Workers<span class="ct num">7</span></a><span class="gap"></span><a class="nv"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.200"/><path d="M8 1.500v2M8 12.500v2M1.500 8h2M12.500 8h2"/></svg>Settings</a></aside>
+<div class="ov-main"><div class="ov-top"><span class="crumb">Northgate Growth <b>/ Overview</b></span><span class="sp"></span>
+<div class="search"><svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.500 10.500L14 14"/></svg>Search tasks, workers, hashes<kbd>⌘K</kbd></div><span class="sim">Simulation</span><span class="chip c-mute">Base Sepolia</span></div>
+<div class="ov-body"><div class="ov-ph"><div><h3>Overview</h3><p>Last 30 days · USDC · demo data</p></div><span class="sp"></span>
+<div class="seg" id="range" role="group" aria-label="Range"><button aria-pressed="false">7d</button><button aria-pressed="true">30d</button><button aria-pressed="false">90d</button></div><a class="btn pri sm" href="#">New task</a></div>
+<div class="ov-kpis" id="ovKpis"></div>
+<div class="ov-cols"><div class="ov-pane ov-chart"><h4>Settlement volume<small>Daily · USDC · demo</small></h4><div class="ch" id="ovChart" role="img" aria-label="Daily settlement volume, last 30 days, demo data"></div></div>
+<div class="ov-pane ov-side"><h4>Needs attention<small>3</small></h4><div id="ovAttn"></div><h4>Proof feed<small>Live</small></h4><div id="ovFeed"></div></div></div>
+<div class="ov-pane"><h4>Recent tasks<small>6 of 26</small></h4><div class="tscroll"><table><thead><tr><th>Status</th><th>Task</th><th>Worker</th><th class="r">Amount</th><th>Deadline</th><th>Tx</th></tr></thead><tbody id="ovBody"></tbody></table></div></div>
+</div></div></div>
+</section>
+<section class="sec">
+<div class="sh"><h2>General notes.</h2><p>A proof shows the source returned this response. It does not show the source is right, or that the worker did the work.</p></div>
+<div class="tm"><div class="yes"><h3>The proof guarantees</h3><span class="dim" style="font-size:13px">Checked on-chain by the escrow</span><ul>
+<li><svg><use href="#i-check"/></svg><span><b>The source returned this response</b>, over TLS, unmodified.</span></li>
+<li><svg><use href="#i-check"/></svg><span><b>A registered attestor signed it.</b> Checked against the contract’s list.</span></li>
+<li><svg><use href="#i-check"/></svg><span><b>It belongs to this task and payee.</b> Replays are rejected.</span></li></ul></div>
+<div class="no"><h3>It does not guarantee</h3><span class="dim" style="font-size:13px">Decide these before you fund</span><ul>
+<li><svg><use href="#i-x"/></svg><span><b>That the source is truthful.</b> A dashboard can be wrong.</span></li>
+<li><svg><use href="#i-x"/></svg><span><b>That the worker did the work.</b> Only that the source reports it.</span></li>
+<li><svg><use href="#i-x"/></svg><span><b>Anything in Simulation.</b> Simulated proofs are synthetic and labelled.</span></li></ul></div></div>
+</section>
+<section class="sec">
+<div class="sh"><h2>Direction H.<br>Section.</h2><p>A settlement drawn like a part: hatching for what is private, balloons for the parts, a title block for the status. Graphite on cool white, one safety orange for the flow of the proof. Technical, exact, stepped.</p></div>
+<div class="spec">
+<div class="w8"><span class="lab">Type · Chivo (800 display, 400–700 text), Chivo Mono for annotations and dimensions only; tabular figures</span><div class="big">Pay when it’s <span style="box-shadow:inset 0 -.16em 0 var(--acc)">proven.</span></div><p style="color:var(--ink-2);max-width:62ch;margin:16px 0 0">Task <span class="num">tsk_7Q2M</span> settled <span class="num">2,500.00</span> USDC to Ada. <span class="num">126,480.50 · 94.1% · 3h 12m</span>.</p></div>
+<div><span class="lab">Roles</span><div class="roles" style="--n:4"><i style="background:var(--paper);color:var(--ink)">paper</i><i style="background:var(--bg);color:var(--ink)">table</i><i style="background:var(--ink);color:var(--paper)">graphite</i><i style="background:var(--acc);color:var(--acc-ink)">flow</i></div></div>
+<div class="w8"><span class="lab">Controls</span><div class="row-c"><a class="btn pri">Fund escrow</a><a class="btn">Save draft</a><a class="btn ghost">Cancel</a><label class="field"><input placeholder="Search tasks" aria-label="Search"></label><span class="chip c-ok"><i></i>Settled</span><span class="chip c-info"><i></i>Proving</span><span class="chip c-warn"><i></i>Expiring</span><span class="chip c-bad"><i></i>Failed</span></div></div>
+<div><span class="lab">Motion · draw-on, stepped</span><p style="margin:0;color:var(--ink-2);font-size:14px">Layers take the orange edge in order; arrows draw on in 8 hard steps; the payout dimension appears last. Buttons press 2 px into their hard shadow. Reduced motion shows the finished drawing.</p></div>
+</div>
+</section>
+<footer><span>Testnet beta. Simulation proofs are synthetic and labelled. Demo data only.</span><span>Proofs by Primus zkTLS · marks belong to their owners; no partnership implied.</span></footer>
+</div>
+<div class="themebar">H · Section<div class="seg" id="theme"><button data-t="light" aria-pressed="true">Light</button><button data-t="dark" aria-pressed="false">Dark</button></div></div>
+<script>window.PP_CFG={"spark":"line","chart":"line","noFill":true,"lw":1.6,"seed":41};</script>
+<script>
+(function(){
+  var root=document.documentElement,$=function(i){return document.getElementById(i)};
+  function setTheme(t){root.dataset.theme=t;document.querySelectorAll('#theme button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.t===t)});window.dispatchEvent(new Event('themechange'))}
+  document.querySelectorAll('#theme button').forEach(function(b){b.onclick=function(){setTheme(b.dataset.t)}});
+  var q=new URLSearchParams(location.search).get('theme');if(q)setTheme(q);
+  document.querySelectorAll('#range button').forEach(function(b){b.onclick=function(){document.querySelectorAll('#range button').forEach(function(x){x.setAttribute('aria-pressed',x===b)})}});
+  var CFG=window.PP_CFG||{};
+  var s=CFG.seed||7;function rnd(){s=(s*16807)%2147483647;return s/2147483647}
+  function series(n,base,vol){var a=[],v=base;for(var i=0;i<n;i++){v=Math.max(base*.3,v+(rnd()-.47)*vol+Math.sin(i/2.5)*vol*.28);a.push(v)}return a}
+  function pts(a,w,h,p,mn,mx){mn=mn===undefined?Math.min.apply(null,a):mn;mx=mx===undefined?Math.max.apply(null,a):mx;return a.map(function(v,i){return [i/(a.length-1)*w,h-p-(v-mn)/(mx-mn||1)*(h-p*2)]})}
+  function L(p){return p.map(function(c,i){return (i?'L':'M')+c[0].toFixed(1)+' '+c[1].toFixed(1)}).join('')}
+  function stepL(p){var d='M'+p[0][0].toFixed(1)+' '+p[0][1].toFixed(1);for(var i=1;i<p.length;i++){d+='H'+p[i][0].toFixed(1)+'V'+p[i][1].toFixed(1)}return d}
+  var K=[['Escrow balance','48,210','.00','+4.2%'],['Settled · 30d','126,480','.50','+11.8%'],['Open tasks','17','','+3'],['Proof success','94.1','%','+1.3 pts'],['Median time to settle','3h 12m','','−18 min']];
+  $('ovKpis').innerHTML=K.map(function(k){var a=series(20,50,12),sp='';
+    if(CFG.spark==='bars'){var mx=Math.max.apply(null,a);sp='<div class="spark" aria-hidden="true">'+a.slice(-14).map(function(v){return '<i style="height:'+Math.round(v/mx*100)+'%"></i>'}).join('')+'</div>'}
+    else if(CFG.spark!=='none'){var p=pts(a,100,24,3);sp='<div class="spark" aria-hidden="true"><svg viewBox="0 0 100 24" preserveAspectRatio="none"><path d="'+L(p)+'" fill="none" stroke="var(--acc)" stroke-width="1.4" vector-effect="non-scaling-stroke"/></svg></div>'}
+    return '<div class="kpi"><small>'+k[0]+'</small><strong>'+k[1]+'<span>'+k[2]+'</span></strong><div class="d">▲ '+k[3]+'</div>'+sp+'</div>'}).join('');
+  var d=series(30,52,16),W=640,H=200,pd=22,mxv=Math.max.apply(null,d)*1.1,g='';
+  [0,.33,.66,1].forEach(function(f){var y=pd+(H-2*pd)*f;g+='<line x1="0" x2="'+W+'" y1="'+y+'" y2="'+y+'" stroke="var(--line)" vector-effect="non-scaling-stroke"/>'});
+  var ch='';
+  if(CFG.chart==='bars'){var bw=W/d.length;ch=d.map(function(v,i){var h=(v/mxv)*(H-2*pd);return '<rect x="'+(i*bw+bw*.18).toFixed(1)+'" y="'+(H-pd-h).toFixed(1)+'" width="'+(bw*.64).toFixed(1)+'" height="'+h.toFixed(1)+'" rx="'+(CFG.barR||2)+'" fill="var(--acc)" opacity="'+(i===19?1:.4)+'"/>'}).join('')}
+  else{var p=pts(d,W-20,H,pd,0,mxv).map(function(c){return [c[0]+4,c[1]]}),line=CFG.chart==='step'?stepL(p):L(p),last=p[p.length-1];
+    ch='<defs><linearGradient id="ar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--acc)" stop-opacity=".22"/><stop offset="1" stop-color="var(--acc)" stop-opacity="0"/></linearGradient></defs>'+(CFG.noFill?'':'<path d="'+line+' L'+last[0]+' '+(H-pd)+' L'+p[0][0]+' '+(H-pd)+'Z" fill="url(#ar)"/>')+'<path d="'+line+'" fill="none" stroke="var(--acc)" stroke-width="'+(CFG.lw||1.8)+'" stroke-linejoin="round" vector-effect="non-scaling-stroke"/><circle cx="'+last[0]+'" cy="'+last[1]+'" r="4" fill="var(--surface)" stroke="var(--acc)" stroke-width="2" vector-effect="non-scaling-stroke"/>'}
+  $('ovChart').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">'+g+ch+'<text x="0" y="'+(H-4)+'">Oct 13</text><text x="'+(W-34)+'" y="'+(H-4)+'">Nov 11</text></svg>';
+  var ic={ok:'i-check',bad:'i-x',warn:'i-clock',info:'i-clock'};
+  function chip(c,t){return '<span class="chip '+c+'"><i></i>'+t+'</span>'}
+  $('ovAttn').innerHTML=[['c-warn','Expires 6h','Lead-gen batch 14','850.00 · Kestrel · agent'],['c-bad','Proof failed','Report delivery','640.00 · Okafor Studio · condition not met'],['c-warn','Disputed','Grant milestone 2','5,000.00 · Meridian DAO · awaiting arbiter']].map(function(a){return '<div class="att">'+chip(a[0],a[1])+'<div><b>'+a[2]+'</b><small>'+a[3]+'</small></div></div>'}).join('');
+  $('ovFeed').innerHTML=[['c-ok','Settled','Q4 growth campaign','2,500.00 → Ada · agent · 2 min ago'],['c-info','Verified','Uptime SLA · p95 ≤ 240 ms','1,200.00 · Pelle Nord · 9 min ago'],['c-warn','Proving','Lead-gen batch 14','850.00 · Kestrel · agent · 21 min ago']].map(function(a){return '<div class="fi">'+chip(a[0],a[1])+'<div><b>'+a[2]+'</b><small>'+a[3]+'</small></div></div>'}).join('');
+  var T=[['c-ok','Settled','Q4 growth campaign · conversions ≥ 120','Ada · agent','2,500.00','Nov 14','0x6be1…d91f','#6C86E8'],['c-info','Verified','Uptime SLA · p95 ≤ 240 ms','Pelle Nord','1,200.00','Nov 18','0xa21c…03be','#F0A98A'],['c-warn','Proving','Lead-gen batch 14 · leads ≥ 400','Kestrel · agent','850.00','Today 18:00','—','#62C9AB'],['c-info','Awaiting proof','Docs migration · pages = 212','Sable · agent','3,100.00','Nov 22','—','#E5C05C'],['c-warn','Disputed','Grant milestone 2 · repo merged','Meridian DAO','5,000.00','Nov 9','0x91ff…7a40','#A3B0C4'],['c-bad','Proof failed','Report delivery · rows ≥ 5,000','Okafor Studio','640.00','Nov 12','0x2d00…c1e8','#C98FD2']];
+  $('ovBody').innerHTML=T.map(function(t){return '<tr><td>'+chip(t[0],t[1])+'</td><td>'+t[2]+'</td><td><span class="idn" style="background:conic-gradient(from 20deg,'+t[7]+',rgba(128,128,128,.25),'+t[7]+')"></span>'+t[3]+'</td><td class="r num">'+t[4].replace(/(\.\d+)$/,'<span class="dim">$1</span>')+'</td><td class="dim">'+t[5]+'</td><td class="hash num">'+t[6]+'</td></tr>'}).join('');
+  window.PP={$:$,series:series,pts:pts,L:L,rnd:rnd,reduced:matchMedia('(prefers-reduced-motion: reduce)').matches};
+})();
+</script>
+<script>
+(function(){
+  var P=window.PP,ly=document.querySelectorAll('#dwg .ly'),fa=document.querySelectorAll('#dwg .fa'),pay=document.querySelector('#dwg .pay'),t=[];
+  function reset(){t.forEach(clearTimeout);t=[];ly.forEach(function(e){e.classList.remove('on')});fa.forEach(function(e){e.classList.remove('on')});pay.classList.remove('on')}
+  function run(){reset();
+    ly.forEach(function(e,i){t.push(setTimeout(function(){e.classList.add('on')},500+i*900));if(fa[i])t.push(setTimeout(function(){fa[i].classList.add('on')},500+i*900+300))});
+    t.push(setTimeout(function(){pay.classList.add('on')},500+5*900));
+    t.push(setTimeout(run,500+5*900+4500))}
+  if(P.reduced){ly.forEach(function(e){e.classList.add('on')});fa.forEach(function(e){e.classList.add('on')});pay.classList.add('on')}else run();
+})();</script>
+</body>
+</html>
