@@ -1,11 +1,14 @@
 # Progress
+
 ## Done
-- Phase 0 research: docs/primus-notes.md, DECISIONS.md D1–D4, docs/copy-options.md
-## In progress
-- Awaiting brand direction pick
-- Phase 0 brand directions v2 (design-studio skill): .design/brief.md, .design/directions/{a-redacted,b-descent,c-sentence}.html, board index.html
-- Brand directions D–I (6 more): .design/directions/{d-route,e-specimen,f-ink-arch,g-thread,h-section,i-weight}.html built by .design/directions/build.mjs from src/*.mjs; board index.html lists all 9
-## Next
-- Wait for brand pick → Phase 1
-## Blockers
-- None. Live mode will need Developer Hub appId/appSecret + template (manual, see notes).
+- **Phase 0** research and brand: docs/primus-notes.md, DECISIONS.md, docs/copy-options.md; nine brand directions (`.design/`), "Descent" chosen.
+- **Phase 1** foundation: tokens, design system, domain model and state machine, SQLite + seed, HTTP API.
+- **Phase 2** app (Simulation): overview, task builder, task detail, Proof Inspector, proofs, ledger, workers, settings, command palette, 404/error.
+- **Phase 3** website and docs: home with interactive demo, product, use cases, security/Trust Model, developers + API reference, request access, status, changelog, brand, legal templates, `/design`, OG image, sitemap/robots.
+- **Phase 4** real integration: `ProofPayEscrow` + 30 Foundry tests, `SignatureVerifier` (test/demo), deploy script, `PrimusProvider` (typed against SDK 0.3.15), signed-request endpoint, demo partner API.
+- **Phase 5** QA: lint 0 errors, typecheck clean, 22 unit + 30 contract + 37 Playwright (9 flows + 28 axe) passing; Lighthouse site 96–97 / a11y 100 / BP 100 / SEO 100, app 94–95 (production build); README with screenshots.
+
+## Known gaps
+- Live end-to-end not run against Primus (no credentials/template): see DECISIONS D6.
+- 22 lint warnings remain (React-compiler rules, deliberate patterns, see eslint.config.mjs).
+- Request-access admin list is API-only (`/api/admin/access-requests`, Bearer `ADMIN_TOKEN`).

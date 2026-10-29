@@ -6,7 +6,7 @@ export function PageHeader({ title, description, actions, breadcrumbs, meta, cla
     <header className={cn("mb-6 grid gap-3", className)}>
       {breadcrumbs && <Breadcrumbs items={breadcrumbs} />}
       <div className="flex flex-wrap items-end gap-x-6 gap-y-3">
-        <div className="grid min-w-0 flex-1 gap-1.5">
+        <div className="grid min-w-0 flex-[1_1_300px] gap-1.5">
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-[28px] leading-[1.05] font-semibold tracking-[-0.035em] [font-variation-settings:'wdth'_114]">{title}</h1>
             {meta}

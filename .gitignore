@@ -17,3 +17,6 @@ contracts/out/
 contracts/cache/
 contracts/broadcast/
 contracts/lib/
+test-results/
+playwright-report/
+tsconfig.tsbuildinfo
