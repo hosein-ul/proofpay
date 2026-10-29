@@ -88,16 +88,16 @@ function buildSpecs(): Spec[] {
     { id: "tsk_4KD9", title: "Uptime SLA — October", w: "w_pelle", amountUsdc: 1200, tpl: T("Uptime SLA"), state: "verified", ago: 3 },
     { id: "tsk_9TNB", title: "Lead-gen batch 14", w: "w_kestrel", amountUsdc: 850, tpl: T("Lead-gen batch"), state: "proving", ago: 2, deadlineIn: 6 },
     { id: "tsk_2WHP", title: "Docs migration — v2", w: "w_sable", amountUsdc: 3100, tpl: T("Docs migration"), state: "awaiting_proof", ago: 4, deadlineIn: 9 * 24 },
-    { id: "tsk_6B1X", title: "Grant milestone 2", w: "w_tomas", amountUsdc: 5000, tpl: T("Bounty test suite"), state: "disputed", ago: 9, failedAttempts: 1, disputeNote: "Worker says the source reported stale numbers; payer disagrees." },
-    { id: "tsk_8E3F", title: "Report delivery", w: "w_okafor", amountUsdc: 640, tpl: T("Report delivery"), state: "awaiting_proof", ago: 5, failedAttempts: 2, deadlineIn: 30 },
+    { id: "tsk_6B1X", title: "Grant milestone 2", w: "w_tomas", amountUsdc: 5000, tpl: T("Bounty test suite"), state: "disputed", ago: 9, disputeNote: "Worker says the source reported stale numbers; payer disagrees." },
+    { id: "tsk_8E3F", title: "Report delivery", w: "w_okafor", amountUsdc: 640, tpl: T("Report delivery"), state: "awaiting_proof", ago: 5, failedAttempts: 1, deadlineIn: 30 },
     { id: "tsk_5N7C", title: "Support queue under 15", w: "w_quill", amountUsdc: 1000, tpl: T("Support queue under target"), state: "proving", ago: 1, deadlineIn: 70 },
     { id: "tsk_3GQ8", title: "Bounty #118 test suite", w: "w_tomas", amountUsdc: 8000, tpl: T("Bounty test suite"), state: "funded", ago: 0.3, deadlineIn: 14 * 24 },
     { id: "tsk_1YJA", title: "Pipeline backfill — Q3", w: "w_linnea", amountUsdc: 3500, tpl: T("Backfill complete"), state: "draft", ago: 0.1, deadlineIn: 20 * 24 },
     { id: "tsk_0ZPR", title: "Spring campaign (draft)", w: "w_ada", amountUsdc: 1800, tpl: T("Growth campaign"), state: "draft", ago: 0.2, deadlineIn: 12 * 24 },
-    { id: "tsk_7RV2", title: "Latency SLA — September", w: "w_pelle", amountUsdc: 2200, tpl: T("Uptime SLA"), state: "expired", ago: 19, failedAttempts: 1 },
+    { id: "tsk_7RV2", title: "Latency SLA — September", w: "w_pelle", amountUsdc: 2200, tpl: T("Uptime SLA"), state: "expired", ago: 19 },
     { id: "tsk_5SDK", title: "Q3 lead-gen batch 9", w: "w_kestrel", amountUsdc: 1200, tpl: T("Lead-gen batch"), state: "expired", ago: 16 },
     { id: "tsk_2M8H", title: "Docs migration — v1", w: "w_sable", amountUsdc: 1500, tpl: T("Docs migration"), state: "refunded", ago: 34 },
-    { id: "tsk_6HC4", title: "Q2 report rows", w: "w_linnea", amountUsdc: 450, tpl: T("Report delivery"), state: "refunded", ago: 48, failedAttempts: 2 },
+    { id: "tsk_6HC4", title: "Q2 report rows", w: "w_linnea", amountUsdc: 450, tpl: T("Report delivery"), state: "refunded", ago: 48, failedAttempts: 1 },
     { id: "tsk_9A0E", title: "Support queue — June", w: "w_quill", amountUsdc: 600, tpl: T("Support queue under target"), state: "refunded", ago: 66 },
     { id: "tsk_4PWT", title: "Bounty #97 test suite", w: "w_tomas", amountUsdc: 2500, tpl: T("Bounty test suite"), state: "resolved", ago: 27, failedAttempts: 1, resolveTo: "released", disputeNote: "Source API was down at the deadline." },
   ];
@@ -120,7 +120,7 @@ function buildSpecs(): Spec[] {
       tpl,
       state: "settled",
       ago: ago + r() * 1.5,
-      failedAttempts: r() < 0.2 ? 1 : 0,
+      failedAttempts: r() < 0.1 ? 1 : 0,
       settledAfterRetry: r() < 0.2,
     });
   });
@@ -170,7 +170,8 @@ export async function seedDemo() {
     const created = NOW - s.ago * DAY;
     const open = s.deadlineIn !== undefined;
     const funded = s.state !== "draft" ? created + (5 + Math.floor(r() * 35)) * MIN : null;
-    const deadline = open ? NOW + s.deadlineIn! * HOUR : created + (7 + Math.floor(r() * 14)) * DAY;
+    let deadline = open ? NOW + s.deadlineIn! * HOUR : created + (7 + Math.floor(r() * 14)) * DAY;
+    if (s.state === "expired" || s.state === "refunded") deadline = Math.min(deadline, NOW - (1 + Math.floor(r() * 3)) * DAY);
     const amount = s.amountUsdc * 1_000_000;
     const payer = "Northgate Growth";
     let updated = created;

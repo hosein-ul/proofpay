@@ -184,6 +184,7 @@ export interface Overview {
   openTasks: number;
   proofSuccessRate: number;
   medianSettleMs: number;
+  /** escrow delta is absolute micro-USDC vs 7 days ago; the others are % or points */
   deltas: { escrow: number; settled: number; open: number; success: number; settle: number };
   sparks: Record<"escrow" | "settled" | "open" | "success" | "settle", number[]>;
   volume: { day: string; amount: number }[];

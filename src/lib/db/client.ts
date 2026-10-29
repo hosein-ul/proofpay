@@ -1,6 +1,7 @@
 import Database from "better-sqlite3";
 import { drizzle, type BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import * as schema from "./schema";
 
@@ -31,7 +32,8 @@ type G = typeof globalThis & { __pp_db?: { db: Db; raw: Database.Database } };
 export function getDbHandle() {
   const g = globalThis as G;
   if (g.__pp_db) return g.__pp_db;
-  const file = process.env.DATABASE_FILE ?? (process.env.VERCEL ? "/tmp/proofpay.db" : path.join(process.cwd(), ".data", "proofpay.db"));
+  // Outside the project tree on purpose: SQLite writes inside it make the dev file-watcher reload the page in a loop.
+  const file = process.env.DATABASE_FILE || path.join(os.tmpdir(), "proofpay", "proofpay.db");
   if (file !== ":memory:") fs.mkdirSync(path.dirname(file), { recursive: true });
   const raw = new Database(file);
   raw.pragma("journal_mode = WAL");

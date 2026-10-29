@@ -152,12 +152,13 @@ export async function listLedger(opts: { kind?: string; taskId?: string; since?:
     .map(toLedger);
 }
 
-export async function listEvents(limit = 60): Promise<(TaskEvent & { title: string })[]> {
+export async function listEvents(limit = 60, opts: { significant?: boolean } = {}): Promise<(TaskEvent & { title: string })[]> {
   const db = await ready();
   const rows = db
     .select({ e: schema.events, title: schema.tasks.title })
     .from(schema.events)
     .leftJoin(schema.tasks, eq(schema.events.taskId, schema.tasks.id))
+    .where(opts.significant ? inArray(schema.events.type, ["funded", "proof_started", "proof_failed", "verified", "settled", "expired", "refunded", "disputed", "resolved"]) : undefined)
     .orderBy(desc(schema.events.at))
     .limit(limit)
     .all();
@@ -253,7 +254,7 @@ export async function getOverview(rangeDays = 30): Promise<Overview> {
     proofSuccessRate: rate,
     medianSettleMs: median,
     deltas: {
-      escrow: pct(sparkEscrow[13], sparkEscrow[6] || 1),
+      escrow: sparkEscrow[13] - sparkEscrow[6],
       settled: pct(settled30, settledPrev || 1),
       open: open - sparkOpen[6],
       success: sparkSuccess[13] - sparkSuccess[6],
