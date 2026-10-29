@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ProofPay — A · Redacted</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wdth,wght@75..100,400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── tokens: ground · raised · sunk · ink levels · one signal ───────────── */
+:root{
+  --ground:#F3F4F6; --raised:#FFFFFF; --sunk:#E9EBEE;
+  --ink:#0B0D12; --ink-2:#464C57; --ink-3:#7A818E;
+  --line:rgba(11,13,18,.10); --line-strong:rgba(11,13,18,.22);
+  --signal:#FFE14D; --signal-ink:#0B0D12;
+  --bar:#0B0D12;
+  --ok:#0F7B55; --ok-bg:#E1F3EA; --warn:#8F5A06; --warn-bg:#FBEFD3; --bad:#B4322A; --bad-bg:#FBE5E2; --info:#1D5FA8; --info-bg:#E2EDF9;
+  --sh-1:0 1px 1px rgba(11,13,18,.04),0 2px 6px -2px rgba(11,13,18,.06);
+  --sh-2:0 1px 1px rgba(11,13,18,.05),0 12px 32px -12px rgba(11,13,18,.18),0 40px 80px -40px rgba(11,13,18,.2);
+  --r-1:3px; --r-2:5px; --r-3:8px;
+  --sans:'Instrument Sans',ui-sans-serif,system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+:root[data-theme="dark"]{
+  --ground:#0A0B0F; --raised:#12141A; --sunk:#07080B;
+  --ink:#ECEEF2; --ink-2:#A3A9B5; --ink-3:#6C7380;
+  --line:rgba(236,238,242,.09); --line-strong:rgba(236,238,242,.22);
+  --signal:#FFE14D; --signal-ink:#0B0D12; --bar:#ECEEF2;
+  --ok:#52D6A0; --ok-bg:rgba(82,214,160,.12); --warn:#F0B550; --warn-bg:rgba(240,181,80,.12); --bad:#FF8076; --bad-bg:rgba(255,128,118,.12); --info:#78B4F4; --info-bg:rgba(120,180,244,.12);
+  --sh-1:0 0 0 1px rgba(255,255,255,.04);
+  --sh-2:0 0 0 1px rgba(255,255,255,.06),0 40px 80px -40px rgba(0,0,0,.9);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font:400 15px/1.5 var(--sans);font-variation-settings:"wdth" 100;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:inherit;text-decoration:none}
+.num{font-variant-numeric:tabular-nums}
+.mono{font-family:var(--mono);font-size:12px;letter-spacing:0}
+.wrap{max-width:1240px;margin:0 auto;padding:0 32px}
+/* ground: fine rule grid + grain, faded */
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px);background-size:100% 28px;
+  -webkit-mask:linear-gradient(180deg,#000,transparent 70%);mask:linear-gradient(180deg,#000,transparent 70%);opacity:.5}
+body>*{position:relative;z-index:1}
+
+/* nav */
+.nav{display:flex;align-items:center;height:68px;gap:36px}
+.brand{display:flex;align-items:center;gap:10px;font:600 19px/1 var(--sans);letter-spacing:-.03em}
+.mark{width:24px;height:24px;display:block}
+.nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:14px;color:var(--ink-2)}
+.nav ul li{cursor:pointer;transition:color .12s}.nav ul li:hover{color:var(--ink)}
+.sp{flex:1}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 18px;border-radius:var(--r-2);font:500 14px var(--sans);border:1px solid var(--line-strong);background:var(--raised);color:var(--ink);cursor:pointer;transition:transform .12s var(--ease),background .12s,box-shadow .12s;box-shadow:var(--sh-1)}
+.btn:hover{background:var(--sunk)}.btn:active{transform:translateY(1px)}
+.btn:focus-visible,.seg button:focus-visible,.field:focus-within{outline:2px solid var(--ink);outline-offset:2px}
+.btn.pri{background:var(--ink);color:var(--ground);border-color:var(--ink);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),var(--sh-1)}
+.btn.pri:hover{background:color-mix(in oklab,var(--ink) 86%,var(--ground))}
+.btn.sm{height:32px;padding:0 12px;font-size:13px}
+.btn.ghost{border-color:transparent;background:transparent;box-shadow:none}
+kbd{font:500 11px var(--mono);border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:4px;padding:0 5px;color:var(--ink-2)}
+
+/* chips */
+.chip{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 8px;border-radius:var(--r-1);font:500 12px var(--sans);white-space:nowrap}
+.chip svg{width:11px;height:11px}
+.c-ok{color:var(--ok);background:var(--ok-bg)}.c-warn{color:var(--warn);background:var(--warn-bg)}.c-bad{color:var(--bad);background:var(--bad-bg)}.c-info{color:var(--info);background:var(--info-bg)}.c-mute{color:var(--ink-2);background:var(--sunk)}
+.sim{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 8px;border-radius:var(--r-1);font:500 11.5px var(--sans);color:var(--ink);border:1px dashed var(--ink-3);background:repeating-linear-gradient(135deg,transparent 0 5px,var(--line) 5px 6px)}
+
+/* ── HERO ─────────────────────────────────────────────────────────────── */
+.hero{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:56px;padding:56px 0 72px;align-items:start}
+.hero h1{font:600 clamp(48px,6.2vw,92px)/.94 var(--sans);letter-spacing:-.055em;margin:18px 0 24px;font-variation-settings:"wdth" 92}
+.hl{background:linear-gradient(var(--signal),var(--signal)) 0 88%/100% 62% no-repeat;color:var(--signal-ink);padding:0 .06em;margin:0 -.06em;animation:hl 900ms steps(14,end) 900ms both}
+:root[data-theme="dark"] .hl{color:var(--signal-ink)}
+@keyframes hl{from{background-size:0 62%}to{background-size:100% 62%}}
+.lede{font-size:18px;line-height:1.5;color:var(--ink-2);max-width:40ch;margin:0 0 28px}
+.cta{display:flex;gap:10px;flex-wrap:wrap}
+.status-line{display:flex;gap:10px;align-items:center;color:var(--ink-2);font-size:13px;margin-bottom:6px}
+.status-line b{font-weight:500;color:var(--ink)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--warn)}
+.attr{margin-top:28px;font-size:12.5px;color:var(--ink-3);max-width:44ch}
+.attr a{border-bottom:1px solid var(--line-strong)}
+
+/* the artefact: an attestation sheet with marginal notes */
+.sheetwrap{display:grid;grid-template-columns:minmax(0,1fr) 210px;gap:0;align-items:start}
+.sheet{background:var(--raised);border:1px solid var(--line-strong);border-radius:var(--r-2);box-shadow:var(--sh-2);padding:0;position:relative}
+.sheet::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--ink);border-radius:var(--r-2) var(--r-2) 0 0}
+.sh-head{display:flex;align-items:center;gap:10px;padding:18px 20px 12px;border-bottom:1px solid var(--line)}
+.sh-head{white-space:nowrap}.sh-head b{font:600 13px var(--sans);letter-spacing:-.01em}
+.sh-head .mono{color:var(--ink-3)}
+.rows{padding:6px 0}
+.row{display:grid;grid-template-columns:128px 1fr;align-items:center;min-height:30px;padding:0 20px;position:relative}
+.row .k{color:var(--ink-3)}
+.row .v{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row+.row{border-top:1px solid color-mix(in oklab,var(--line) 55%,transparent)}
+.redact{position:relative;display:inline-block;color:transparent;user-select:none}
+.redact::after{content:"";position:absolute;inset:3px -3px;background:var(--bar);border-radius:1px;transform-origin:left;transform:scaleX(var(--r,1))}
+.sheet.play .redact::after{animation:bar 380ms steps(7,end) var(--d,0ms) both}
+@keyframes bar{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.claim .v{position:relative}
+.claim .v span.mk{background:linear-gradient(var(--signal),var(--signal)) 0 0/0 100% no-repeat;color:var(--signal-ink);padding:2px 4px;margin:0 -4px;border-radius:1px;background-size:100% 100%}
+.sheet.play .claim span.mk{animation:mark 520ms steps(10,end) 2300ms both}
+@keyframes mark{from{background-size:0 100%;color:var(--ink)}to{background-size:100% 100%;color:var(--signal-ink)}}
+.checks{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--line);margin-top:6px}
+.checks div{display:flex;align-items:center;gap:8px;padding:10px 20px;font-size:12.5px;color:var(--ink-2);border-bottom:1px solid color-mix(in oklab,var(--line) 55%,transparent)}
+.checks div:nth-child(3n+2),.checks div:nth-child(3n){padding-left:12px}
+.tick{width:14px;height:14px;border-radius:2px;border:1.5px solid var(--line-strong);display:grid;place-items:center;flex:none}
+.tick svg{width:9px;height:9px;opacity:0;stroke:var(--ink);stroke-width:3}
+.sheet.play .checks div .tick{animation:tk 140ms steps(2,end) calc(2900ms + var(--i)*170ms) both}
+.sheet.play .checks div .tick svg{animation:tks 1ms linear calc(2900ms + var(--i)*170ms) both}
+.checks.static .tick{background:var(--ink);border-color:var(--ink)}.checks.static .tick svg{opacity:1;stroke:var(--ground)}
+@keyframes tk{to{background:var(--ink);border-color:var(--ink)}}
+@keyframes tks{to{opacity:1;stroke:var(--ground)}}
+.sh-foot{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-top:1px solid var(--line);color:var(--ink-3)}
+.notes{padding-top:46px;position:relative}
+.note{height:30px;display:flex;align-items:center;position:relative;padding-left:22px;font-size:12px;line-height:1.25;color:var(--ink-2)}
+.note::before{content:"";position:absolute;left:0;top:50%;width:16px;height:1px;background:var(--ink-3)}
+.note.on::before{background:var(--ink);height:2px}
+.note.tall{height:60px}
+.note b{color:var(--ink);font-weight:600}
+.replay{margin:14px 0 0 0;display:inline-flex}
+
+/* ── section scaffolding ───────────────────────────────────────────── */
+section{padding:72px 0;border-top:1px solid var(--line)}
+.sec-head{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:56px;margin-bottom:40px;align-items:end}
+h2{font:600 clamp(30px,3.6vw,50px)/1 var(--sans);letter-spacing:-.045em;margin:0;font-variation-settings:"wdth" 92}
+h2 em{font-style:normal;color:var(--ink-3)}
+.sec-head p{margin:0;color:var(--ink-2);max-width:52ch;font-size:16px}
+.label{font-size:12.5px;color:var(--ink-3);margin-bottom:10px;display:block}
+
+/* four forms */
+.forms{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--line-strong);border-radius:var(--r-2);background:var(--raised);box-shadow:var(--sh-1)}
+.form{padding:22px 22px 24px;display:flex;flex-direction:column;gap:14px;min-height:340px}
+.form+.form{border-left:1px solid var(--line)}
+.form h3{font:600 20px/1 var(--sans);letter-spacing:-.03em;margin:0;display:flex;gap:10px;align-items:baseline}
+.form h3 i{font:500 12px var(--mono);color:var(--ink-3);font-style:normal}
+.form p{margin:0;color:var(--ink-2);font-size:14px}
+.frag{margin-top:auto;border:1px solid var(--line);border-radius:var(--r-1);background:var(--ground);padding:12px 12px;font-size:12px}
+.frag .ln{display:flex;justify-content:space-between;gap:8px;padding:5px 0}
+.frag .ln+.ln{border-top:1px dashed var(--line)}
+.fld{border-bottom:1.5px solid var(--ink);padding:0 3px;font-weight:600}
+.bar{display:inline-block;height:11px;background:var(--bar);border-radius:1px;vertical-align:-1px}
+.amt{font-variant-numeric:tabular-nums;font-weight:500}
+.dim{color:var(--ink-3)}
+
+/* ── APP WINDOW ───────────────────────────────────────────────────── */
+.stage{position:relative;margin-right:-96px}
+.win{background:var(--ground);border:1px solid var(--line-strong);border-radius:var(--r-3) 0 0 var(--r-3);box-shadow:var(--sh-2);overflow:hidden;display:grid;grid-template-columns:208px minmax(0,1fr);font-size:13px;min-height:620px}
+.sb{background:var(--raised);border-right:1px solid var(--line);padding:16px 12px;display:flex;flex-direction:column;gap:2px}
+.ws{display:flex;align-items:center;gap:10px;padding:6px 8px 14px;border-bottom:1px solid var(--line);margin-bottom:10px}
+.ws .av{width:26px;height:26px;border-radius:var(--r-2);background:var(--ink);color:var(--ground);display:grid;place-items:center;font:600 12px var(--sans)}
+.ws small{display:block;color:var(--ink-3);font-size:11.5px;line-height:1.2}
+.ws b{font-weight:600;font-size:13px;line-height:1.2}
+.nv{display:flex;align-items:center;gap:10px;height:32px;padding:0 10px;border-radius:var(--r-1);color:var(--ink-2);position:relative;transition:background .12s}
+.nv:hover{background:var(--sunk)}
+.nv svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.nv.on{color:var(--ink);font-weight:500;background:var(--sunk)}
+.nv.on::before{content:"";position:absolute;left:-12px;top:6px;bottom:6px;width:3px;background:var(--signal);border-radius:0 2px 2px 0;box-shadow:0 0 0 .5px var(--line-strong)}
+.nv .ct{margin-left:auto;font-size:11px;color:var(--ink-3)}
+.sb .gap{flex:1}
+.main{min-width:0;display:flex;flex-direction:column}
+.top{display:flex;align-items:center;gap:12px;height:52px;padding:0 24px;border-bottom:1px solid var(--line);background:var(--raised)}
+.search{display:flex;align-items:center;gap:8px;height:30px;border:1px solid var(--line-strong);border-radius:var(--r-2);padding:0 8px 0 10px;color:var(--ink-3);min-width:240px}
+.search svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.6}
+.search kbd{margin-left:auto}
+.body{padding:24px 24px 28px;display:grid;gap:22px}
+.ph{display:flex;align-items:flex-end;gap:16px}
+.ph h3{font:600 26px/1 var(--sans);letter-spacing:-.04em;margin:0}
+.ph p{margin:6px 0 0;color:var(--ink-3);font-size:13px}
+.seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:var(--r-2);padding:2px;background:var(--sunk);position:relative}
+.seg button{all:unset;cursor:pointer;font:500 12px var(--sans);padding:5px 10px;border-radius:3px;color:var(--ink-2);position:relative;z-index:1;transition:color .12s}
+.seg button[aria-pressed="true"]{background:var(--raised);color:var(--ink);box-shadow:var(--sh-1)}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-top:1px solid var(--ink);border-bottom:1px solid var(--line)}
+.kpi{padding:14px 16px 14px 0;margin-right:16px}
+.kpi+.kpi{border-left:1px solid var(--line);padding-left:16px}
+.kpi small{color:var(--ink-3);font-size:12px;display:block}
+.kpi strong{display:block;font:600 27px/1.1 var(--sans);letter-spacing:-.04em;margin:6px 0 4px;font-variant-numeric:tabular-nums}
+.kpi strong span{color:var(--ink-3);font-weight:500}
+.kpi strong u{text-decoration:none;font-size:15px;font-weight:500;color:var(--ink-3);margin-right:3px;letter-spacing:0}
+.kpi .d{font-size:12px;color:var(--ok);display:flex;align-items:center;gap:4px}
+.kpi .d.bad{color:var(--bad)}
+.kpi svg.sp{width:100%;height:24px;margin-top:8px;display:block}
+.cols{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:24px}
+.pane h4{margin:0 0 10px;font:600 13px var(--sans);display:flex;align-items:center;gap:8px}
+.pane h4 small{margin-left:auto;font-weight:400;color:var(--ink-3);font-size:12px}
+.chartbox{border:1px solid var(--line);border-radius:var(--r-2);background:var(--raised);padding:14px 14px 8px}
+.chart{width:100%;height:210px;display:block;overflow:visible}
+.chart text{font:400 11px var(--sans);fill:var(--ink-3);font-variant-numeric:tabular-nums}
+.attn{border:1px solid var(--line);border-radius:var(--r-2);background:var(--raised)}
+.att{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;transition:background .12s;cursor:pointer}
+.att:hover{background:var(--sunk)}
+.att+.att{border-top:1px solid var(--line)}
+.att b{font-weight:500;display:block;line-height:1.3}
+.att small{color:var(--ink-3);font-size:12px}
+.att .chip{margin-top:1px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{position:sticky;top:0;text-align:left;font-weight:500;color:var(--ink-3);font-size:12px;padding:0 12px 8px;border-bottom:1px solid var(--ink)}
+th.r,td.r{text-align:right}
+tbody td{padding:0 12px;height:42px;border-bottom:1px solid var(--line);white-space:nowrap}
+tbody tr{transition:background .1s;cursor:default}
+tbody tr:hover{background:var(--raised)}
+tbody tr:hover td:first-child{box-shadow:inset 3px 0 0 var(--signal)}
+td .w{display:flex;align-items:center;gap:8px}
+.idn{width:20px;height:20px;border-radius:50%;flex:none}
+td .t{overflow:hidden;text-overflow:ellipsis;max-width:260px}
+.hash{font:400 12px var(--mono);color:var(--ink-3)}
+.cut{border-bottom:1px dotted var(--ink-3)}
+.live{display:flex;align-items:center;gap:8px}
+.pulse{width:6px;height:6px;background:var(--ink);border-radius:50%;animation:pl 2s steps(2,end) infinite}
+@keyframes pl{50%{opacity:.15}}
+
+/* ── trust section: guarantee vs not ─────────────────────────────── */
+.trust{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line-strong);border-radius:var(--r-2);background:var(--raised);box-shadow:var(--sh-1);overflow:hidden}
+.trust>div{padding:28px 30px 30px}
+.trust>div+div{border-left:1px solid var(--line);background:repeating-linear-gradient(135deg,transparent 0 9px,var(--line) 9px 10px)}
+.trust h3{margin:0 0 4px;font:600 22px var(--sans);letter-spacing:-.035em}
+.trust ul{list-style:none;padding:0;margin:18px 0 0;display:grid;gap:0}
+.trust li{display:grid;grid-template-columns:22px 1fr;gap:10px;padding:12px 0;border-top:1px solid var(--line);color:var(--ink-2);font-size:14.5px}
+.trust li b{color:var(--ink);font-weight:500}
+.glyph{width:16px;height:16px;margin-top:2px}
+.trust .foot{margin-top:18px;font-size:12.5px;color:var(--ink-3)}
+
+/* ── specimen ─────────────────────────────────────────────────── */
+.spec{display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
+.spec>div{grid-column:span 4;min-width:0}
+.spec .wide{grid-column:span 8}
+.roles{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--line-strong);border-radius:var(--r-2);overflow:hidden}
+.roles i{display:block;height:92px;padding:8px;font:500 11px var(--mono);font-style:normal;border-right:1px solid var(--line)}
+.roles i:last-child{border-right:0}
+.type-big{font:600 64px/.95 var(--sans);letter-spacing:-.055em;font-variation-settings:"wdth" 92}
+.row-c{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.field{display:flex;align-items:center;gap:8px;height:40px;border:1px solid var(--line-strong);background:var(--raised);border-radius:var(--r-2);padding:0 12px;min-width:220px;color:var(--ink-2);transition:box-shadow .12s}
+.field:focus-within{box-shadow:0 0 0 4px color-mix(in oklab,var(--signal) 55%,transparent);outline-offset:0;outline:1.5px solid var(--ink)}
+.field input{all:unset;flex:1;color:var(--ink)}
+.field input::placeholder{color:var(--ink-3)}
+footer{padding:40px 0 100px;border-top:1px solid var(--line);color:var(--ink-3);font-size:13px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.themebar{position:fixed;right:16px;bottom:16px;z-index:20;display:flex;align-items:center;gap:10px;background:var(--raised);border:1px solid var(--line-strong);border-radius:6px;padding:6px 8px 6px 12px;box-shadow:var(--sh-2);font-size:12px;color:var(--ink-2)}
+
+/* ── responsive ── */
+@media(max-width:1080px){.hero,.sec-head{grid-template-columns:1fr;gap:32px}.stage{margin-right:0}.win{border-radius:var(--r-3)}.forms{grid-template-columns:repeat(2,1fr)}.form:nth-child(3){border-left:0}.form:nth-child(n+3){border-top:1px solid var(--line)}.spec>div,.spec .wide{grid-column:span 12}}
+@media(max-width:820px){.wrap{padding:0 20px}.nav ul{display:none}.win{grid-template-columns:1fr}.sb{display:none}.ph{flex-wrap:wrap}.pane{overflow-x:auto}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi:nth-child(3){border-left:0;padding-left:0}.cols{grid-template-columns:1fr}.trust{grid-template-columns:1fr}.trust>div+div{border-left:0;border-top:1px solid var(--line)}.sheetwrap{grid-template-columns:1fr}.notes{display:none}.search{display:none}.body{padding:18px 16px}td.hide-s,th.hide-s{display:none}}
+@media(max-width:560px){.forms{grid-template-columns:1fr}.form+.form{border-left:0;border-top:1px solid var(--line)}.row{grid-template-columns:104px 1fr;padding:0 14px}.checks{grid-template-columns:1fr 1fr}.checks div:nth-child(3n+2),.checks div:nth-child(3n){padding-left:20px}.checks div:nth-child(2n){padding-left:12px}.hero{padding-top:28px}.roles{grid-template-columns:repeat(2,1fr)}.roles i{border-bottom:1px solid var(--line)}.type-big{font-size:44px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.sheet .redact::after{transform:scaleX(1)}.sheet .claim span.mk{background-size:100% 100%}.checks .tick{background:var(--ink);border-color:var(--ink)}.checks .tick svg{opacity:1;stroke:var(--ground)}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-check" viewBox="0 0 12 12"><path d="M2 6.4l2.6 2.6L10 3.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-x" viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6 3.6V6l1.7 1" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-dot" viewBox="0 0 12 12"><circle cx="6" cy="6" r="3" fill="currentColor"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 12 12"><path d="M6 1.8l4.6 8H1.4z M6 5v2.4 M6 8.8v.1" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+  <symbol id="m" viewBox="0 0 24 24"><rect x="1" y="3" width="22" height="5" fill="var(--ink)"/><rect x="1" y="10" width="22" height="5" fill="var(--ink)"/><rect x="1" y="17" width="12" height="5" fill="#FFE14D" stroke="var(--ink)" stroke-width="1.2"/></symbol>
+</svg>
+
+<div class="wrap">
+  <header class="nav">
+    <a class="brand" href="#"><svg class="mark" aria-hidden="true"><use href="#m"/></svg>ProofPay</a>
+    <ul><li>Product</li><li>Use cases</li><li>Security</li><li>Developers</li><li>Changelog</li></ul>
+    <span class="sp"></span>
+    <a class="btn ghost sm" href="#">Try the demo</a><a class="btn pri sm" href="#">Request access</a>
+  </header>
+
+  <!-- HERO ─────────────────────────────────────────────── -->
+  <main class="hero">
+    <div>
+      <div class="status-line"><span class="dot"></span><b>Testnet beta</b><span>Base Sepolia · mock USDC</span></div>
+      <h1>Pay when<br>it’s <span class="hl">proven.</span></h1>
+      <p class="lede">Lock funds against a condition. Your worker proves it with a Primus zkTLS attestation. The escrow releases only when the proof verifies. Nothing else is revealed.</p>
+      <div class="cta"><a class="btn pri" href="#">Request access</a><a class="btn" href="#">Try a settlement <kbd>↵</kbd></a></div>
+      <p class="attr">Proofs by <a href="https://docs.primuslabs.xyz" rel="noopener">Primus zkTLS</a>. An attestation shows the source really returned this response. It does not show the data is true or that the work was done.</p>
+    </div>
+
+    <div>
+      <div class="sheetwrap">
+        <div class="sheet play" id="sheet" aria-label="Example attestation with hidden fields, simulation">
+          <div class="sh-head"><b>Attestation</b><span class="mono">tsk_7Q2M</span><span class="sp"></span><span class="sim">Simulation · synthetic</span></div>
+          <div class="rows mono" id="rows"></div>
+          <div class="checks" id="checks"></div>
+          <div class="sh-foot"><span class="mono">Escrow · 2,500.000000 USDC</span><span class="chip c-ok"><svg><use href="#i-check"/></svg>Verified</span></div>
+        </div>
+        <div class="notes" id="notes"></div>
+      </div>
+      <button class="btn sm replay" id="replay" type="button">Replay redaction</button>
+    </div>
+  </main>
+
+  <!-- HOW IT WORKS ─────────────────────────────────────── -->
+  <section>
+    <div class="sec-head"><h2>Four lines.<br><em>One fact disclosed.</em></h2><p>A task is a short form. The worker fills in the proof; the escrow reads only the line that was meant to be read.</p></div>
+    <div class="forms">
+      <div class="form"><h3><i>01</i>Define</h3><p>Pick a source and a rule in plain words. The rule is hashed into the task.</p>
+        <div class="frag"><div class="ln"><span class="dim">Release</span><span class="amt"><span class="fld">2,500.00</span> USDC</span></div><div class="ln"><span class="dim">When</span><span><span class="fld">conversions</span> ≥ <span class="fld">120</span></span></div><div class="ln"><span class="dim">By</span><span class="fld">Nov 14</span></div></div></div>
+      <div class="form"><h3><i>02</i>Lock</h3><p>Fund the escrow. The money stays put until a proof lands or the deadline passes.</p>
+        <div class="frag"><div class="ln"><span class="dim">Escrow in</span><span class="amt">+2,500.000000</span></div><div class="ln"><span class="dim">Task</span><span class="mono">tsk_7Q2M</span></div><div class="ln"><span class="dim">State</span><span class="chip c-info"><svg><use href="#i-dot"/></svg>Awaiting proof</span></div></div></div>
+      <div class="form"><h3><i>03</i>Prove</h3><p>The worker attests the source response. Only the threshold result is disclosed.</p>
+        <div class="frag"><div class="ln"><span class="dim">spend_usd</span><span class="bar" style="width:84px"></span></div><div class="ln"><span class="dim">account_id</span><span class="bar" style="width:112px"></span></div><div class="ln"><span class="dim">conversions</span><span><span style="background:var(--signal);color:var(--signal-ink);padding:1px 5px">≥ 120 → true</span></span></div></div></div>
+      <div class="form"><h3><i>04</i>Settle</h3><p>The escrow checks the signature, the binding and the window, then pays.</p>
+        <div class="frag"><div class="ln"><span class="dim">Release out</span><span class="amt">−2,500.000000</span></div><div class="ln"><span class="dim">To</span><span>Ada · agent</span></div><div class="ln"><span class="dim">Tx</span><span class="hash"><span class="cut" title="0x6be1c0a47f…d91f">0x6be1…d91f</span></span></div></div></div>
+    </div>
+  </section>
+
+  <!-- APP ──────────────────────────────────────────────── -->
+  <section>
+    <div class="sec-head"><h2>The ledger<br><em>keeps its own receipts.</em></h2><p>Every state change is an event with an actor, a time and a transaction. Demo data below, labelled as such.</p></div>
+    <div class="stage">
+      <div class="win" role="img" aria-label="ProofPay overview screen, demo data">
+        <aside class="sb">
+          <div class="ws"><div class="av">N</div><div><b>Northgate Growth</b><small>Workspace · demo</small></div></div>
+          <a class="nv on"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="5"/><rect x="9" y="2" width="5" height="5"/><rect x="2" y="9" width="5" height="5"/><rect x="9" y="9" width="5" height="5"/></svg>Overview</a>
+          <a class="nv"><svg viewBox="0 0 16 16"><path d="M2 4h12M2 8h12M2 12h8"/></svg>Tasks<span class="ct num">26</span></a>
+          <a class="nv"><svg viewBox="0 0 16 16"><path d="M8 1.5l5.5 2v4.2c0 3-2.3 5.3-5.5 6.8C4.800 13 2.500 10.700 2.500 7.700V3.500z"/></svg>Proofs</a>
+          <a class="nv"><svg viewBox="0 0 16 16"><path d="M2 3h12M2 7h12M2 11h7M12 10v4M10 12h4"/></svg>Ledger</a>
+          <a class="nv"><svg viewBox="0 0 16 16"><circle cx="8" cy="5.500" r="2.500"/><path d="M3 13.500c.5-2.500 2.500-3.800 5-3.800s4.500 1.300 5 3.800"/></svg>Workers<span class="ct num">7</span></a>
+          <span class="gap"></span>
+          <a class="nv"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.200"/><path d="M8 1.500v2M8 12.500v2M1.500 8h2M12.500 8h2M3.400 3.400l1.400 1.400M11.200 11.200l1.400 1.400M3.400 12.600l1.400-1.400M11.200 4.800l1.400-1.400"/></svg>Settings</a>
+        </aside>
+        <div class="main">
+          <div class="top"><div class="search"><svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.500"/><path d="M10.500 10.500L14 14"/></svg>Search tasks, workers, hashes<kbd>⌘K</kbd></div><span class="sp"></span><span class="sim">Simulation</span><span class="chip c-mute">Base Sepolia</span></div>
+          <div class="body">
+            <div class="ph"><div><h3>Overview</h3><p>Last 30 days · all amounts in USDC · demo data</p></div><span class="sp"></span><div class="seg" id="range" role="group" aria-label="Range"><button aria-pressed="false">7d</button><button aria-pressed="true">30d</button><button aria-pressed="false">90d</button></div><a class="btn pri sm" href="#">New task</a></div>
+            <div class="kpis" id="kpis"></div>
+            <div class="cols">
+              <div class="pane"><h4>Settlement volume<small>Daily · USDC</small></h4><div class="chartbox"><svg class="chart" id="chart" viewBox="0 0 640 210" preserveAspectRatio="none" role="img" aria-label="Daily settlement volume for the last 30 days, demo data"></svg></div></div>
+              <div class="pane"><h4>Needs attention<small>3</small></h4>
+                <div class="attn">
+                  <div class="att"><span class="chip c-warn"><svg><use href="#i-clock"/></svg>Expires 6h</span><div><b>Lead-gen batch 14</b><small>850.00 · Kestrel · agent</small></div></div>
+                  <div class="att"><span class="chip c-bad"><svg><use href="#i-x"/></svg>Proof failed</span><div><b>Report delivery</b><small>640.00 · Okafor Studio · condition not met</small></div></div>
+                  <div class="att"><span class="chip c-warn"><svg><use href="#i-alert"/></svg>Disputed</span><div><b>Grant milestone 2</b><small>5,000.00 · Meridian · awaiting arbiter</small></div></div>
+                </div>
+              </div>
+            </div>
+            <div class="pane"><h4><span class="live"><span class="pulse"></span>Recent tasks</span><small>Showing 6 of 26</small></h4>
+              <table><thead><tr><th>Status</th><th>Task</th><th class="hide-s">Worker</th><th class="r">Amount</th><th class="hide-s">Deadline</th><th class="hide-s">Proof</th></tr></thead><tbody id="tbody"></tbody></table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST ─────────────────────────────────────────────── -->
+  <section>
+    <div class="sec-head"><h2>What a proof says.<br><em>And what it can’t.</em></h2><p>The Trust Model is on every review screen and in Settings. It is plain on purpose.</p></div>
+    <div class="trust">
+      <div><h3>The proof guarantees</h3><span class="dim" style="font-size:13px">Verified on-chain by the escrow</span>
+        <ul>
+          <li><svg class="glyph"><use href="#i-check"/></svg><span><b>The source returned this response.</b> Over TLS, unmodified, at this time.</span></li>
+          <li><svg class="glyph"><use href="#i-check"/></svg><span><b>A registered attestor signed it.</b> The signature is checked against the contract’s list.</span></li>
+          <li><svg class="glyph"><use href="#i-check"/></svg><span><b>It belongs to this task and this payee.</b> Replays are rejected.</span></li>
+        </ul></div>
+      <div><h3>It does not guarantee</h3><span class="dim" style="font-size:13px">Decide these before you fund</span>
+        <ul>
+          <li><svg class="glyph"><use href="#i-x"/></svg><span><b>That the source is telling the truth.</b> A dashboard can be wrong.</span></li>
+          <li><svg class="glyph"><use href="#i-x"/></svg><span><b>That the worker did the work.</b> Only that the source reports the condition.</span></li>
+          <li><svg class="glyph"><use href="#i-x"/></svg><span><b>Anything in Simulation.</b> Simulated proofs are synthetic and labelled.</span></li>
+        </ul></div>
+    </div>
+  </section>
+
+  <!-- SPECIMEN ──────────────────────────────────────────── -->
+  <section>
+    <div class="sec-head"><h2>Direction A.<br><em>Redacted.</em></h2><p>The page is defined by what it withholds. One signal colour, used only on the claim that is allowed to be seen. Quiet direction: restraint carried by one asset and exact typography.</p></div>
+    <div class="spec">
+      <div class="wide"><span class="label">Type · Instrument Sans (narrowed display, wdth 92) · IBM Plex Mono only inside documents and hashes</span><div class="type-big">Pay when it’s <span class="hl" style="animation:none">proven.</span></div>
+        <p style="color:var(--ink-2);max-width:60ch;margin:16px 0 0">Task <span class="mono">tsk_7Q2M</span> settled <span class="num">2,500.00</span> USDC to Ada. 14,208.75 · 126,480.50 · 94.1%. Figures are tabular, decimals dimmed, units small.</p></div>
+      <div><span class="label">Roles</span><div class="roles"><i style="background:var(--ground)">ground</i><i style="background:var(--raised)">raised</i><i style="background:var(--ink);color:var(--ground)">ink</i><i style="background:var(--signal);color:var(--signal-ink)">signal</i></div></div>
+      <div class="wide"><span class="label">Controls</span><div class="row-c"><a class="btn pri">Fund escrow</a><a class="btn">Save draft</a><a class="btn ghost">Cancel</a><label class="field"><input placeholder="Search tasks" aria-label="Search"><kbd>/</kbd></label><span class="chip c-ok"><svg><use href="#i-check"/></svg>Settled</span><span class="chip c-info"><svg><use href="#i-dot"/></svg>Proving</span><span class="chip c-warn"><svg><use href="#i-clock"/></svg>Expiring</span><span class="chip c-bad"><svg><use href="#i-x"/></svg>Failed</span></div></div>
+      <div><span class="label">Motion · mechanical, stepped</span><p style="margin:0;color:var(--ink-2);font-size:14px">Bars lay down in 7 hard steps, line by line. The claim is highlighted in 10 steps; the checklist ticks at 170 ms intervals. UI feedback is 120 ms ease-out. No fades, no count-ups.</p></div>
+    </div>
+  </section>
+
+  <footer><span>Testnet beta. Simulation proofs are synthetic and labelled. Demo data only.</span><span>Proofs by Primus zkTLS · marks belong to their owners; no partnership implied.</span></footer>
+</div>
+
+<div class="themebar">A · Redacted <div class="seg" id="theme"><button data-t="light" aria-pressed="true">Light</button><button data-t="dark" aria-pressed="false">Dark</button></div></div>
+
+<script>
+(function(){
+  var root=document.documentElement;
+  function setTheme(t){root.dataset.theme=t;document.querySelectorAll('#theme button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.t===t)})}
+  document.querySelectorAll('#theme button').forEach(function(b){b.onclick=function(){setTheme(b.dataset.t)}});
+  if(new URLSearchParams(location.search).get('theme')==='dark')setTheme('dark');
+  document.querySelectorAll('#range button').forEach(function(b){b.onclick=function(){document.querySelectorAll('#range button').forEach(function(x){x.setAttribute('aria-pressed',x===b)})}});
+
+  // attestation rows: [key, value html, note?, redacted?]
+  var R=[
+    ['recipient','0x4B1e…9aD2','Payee. Must equal the task’s beneficiary.'],
+    ['request.url','https://partner.example/api/q4'],
+    ['request.method','GET'],
+    ['resolve','$.stats.conversions'],
+    ['data.account_id','<span class="redact" style="--d:0ms">acct_88213_nrthgt</span>','<b>Hidden.</b> The verifier never sees it.',1],
+    ['data.spend_usd','<span class="redact" style="--d:380ms">48,210.55</span>','',1],
+    ['data.revenue','<span class="redact" style="--d:760ms">212,904.10</span>','',1],
+    ['attCondition','<span class="mk">conversions ≥ 120 → true</span>','<b>Disclosed.</b> Only that the threshold was met.',2],
+    ['timestamp','2026-11-12T09:41:07Z','Inside the task’s proof window.'],
+    ['additionParams','{"taskId":"tsk_7Q2M"}','Binds the proof to this task.'],
+    ['attestor','0x9F3c…c21E','Checked against registered attestors.'],
+    ['signature','0x30450221…a9b1','65 bytes. Recovered on-chain.']
+  ];
+  var rows=document.getElementById('rows'),notes=document.getElementById('notes');
+  R.forEach(function(r){
+    var d=document.createElement('div');d.className='row'+(r[3]===2?' claim':'');
+    d.innerHTML='<span class="k">'+r[0]+'</span><span class="v">'+r[1]+'</span>';rows.appendChild(d);
+    var n=document.createElement('div');n.className='note'+(r[3]===2?' on':'');n.innerHTML=r[2]||'';notes.appendChild(n);
+  });
+  var C=['Signature valid','Attestor known','Bound to task','Not replayed','Within window','Condition satisfied'];
+  var ck=document.getElementById('checks');
+  C.forEach(function(c,i){var d=document.createElement('div');d.style.setProperty('--i',i);d.innerHTML='<span class="tick"><svg viewBox="0 0 12 12"><use href="#i-check"/></svg></span>'+c;ck.appendChild(d)});
+  var sheet=document.getElementById('sheet');
+  function replay(){sheet.classList.remove('play');void sheet.offsetWidth;sheet.classList.add('play')}
+  document.getElementById('replay').onclick=replay;
+  setInterval(function(){ if(!document.hidden && sheet.getBoundingClientRect().top<innerHeight) replay() },12000);
+
+  // seeded series
+  var s=11;function rnd(){s=(s*16807)%2147483647;return s/2147483647}
+  function series(n,base,vol){var a=[],v=base;for(var i=0;i<n;i++){v=Math.max(base*.3,v+(rnd()-.47)*vol+Math.sin(i/2.6)*vol*.25);a.push(v)}return a}
+  function pts(a,w,h,p,mn,mx){mn=mn===undefined?Math.min.apply(null,a):mn;mx=mx===undefined?Math.max.apply(null,a):mx;return a.map(function(v,i){return [i/(a.length-1)*w,h-p-(v-mn)/(mx-mn||1)*(h-p*2)]})}
+  function L(p){return p.map(function(c,i){return (i?'L':'M')+c[0].toFixed(1)+' '+c[1].toFixed(1)}).join('')}
+  var K=[['Escrow balance','48,210','.00','USDC','+4.2%',0],['Settled · 30d','126,480','.50','USDC','+11.8%',0],['Open tasks','17','','','+3',0],['Proof success','94.1','%','','+1.3 pts',0],['Median time to settle','3h 12m','','','−18 min',0]];
+  document.getElementById('kpis').innerHTML=K.map(function(k){var p=pts(series(22,50,12),100,24,3);
+    return '<div class="kpi"><small>'+k[0]+'</small><strong>'+(k[3]?'<u>'+k[3]+'</u>':'')+k[1]+'<span>'+k[2]+'</span></strong><div class="d">▲ '+k[4]+'</div><svg class="sp" viewBox="0 0 100 24" preserveAspectRatio="none" aria-hidden="true"><path d="'+L(p)+'" fill="none" stroke="var(--ink)" stroke-width="1.2" vector-effect="non-scaling-stroke"/></svg></div>'}).join('');
+  // chart
+  var data=series(30,52,16),W=640,H=210,P=22,p=pts(data,W-48,H,P,0,Math.max.apply(null,data)*1.1);p=p.map(function(c){return [c[0]+8,c[1]]});
+  var g='';[0,.33,.66,1].forEach(function(f){var y=P+(H-2*P)*f;g+='<line x1="0" x2="'+W+'" y1="'+y+'" y2="'+y+'" stroke="var(--line)" vector-effect="non-scaling-stroke"/>'});
+  var hi=19;
+  document.getElementById('chart').innerHTML=g+'<line x1="'+p[hi][0]+'" x2="'+p[hi][0]+'" y1="8" y2="'+(H-P)+'" stroke="var(--ink)" stroke-width="1" vector-effect="non-scaling-stroke"/><rect x="'+(p[hi][0]-4)+'" y="'+(H-P-1)+'" width="8" height="2" fill="var(--signal)"/>'
+   +'<path d="'+L(p)+'" fill="none" stroke="var(--ink)" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>'
+   +'<circle cx="'+p[hi][0]+'" cy="'+p[hi][1]+'" r="4" fill="var(--signal)" stroke="var(--ink)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>'
+   +'<text x="'+(p[hi][0]+8)+'" y="18">Nov 3 · 4 released · 9,350.00</text><text x="0" y="'+(H-4)+'">Oct 13</text><text x="'+(W-34)+'" y="'+(H-4)+'">Nov 11</text>';
+  // table
+  var T=[['c-ok','i-check','Settled','Q4 growth campaign · conversions ≥ 120','Ada · agent','2,500.00','Nov 14','0x6be1…d91f','#7C8BFF'],
+         ['c-info','i-dot','Verified','Uptime SLA · p95 ≤ 240 ms','Pelle Nord','1,200.00','Nov 18','0xa21c…03be','#FF9E7C'],
+         ['c-warn','i-dot','Proving','Lead-gen batch 14 · leads ≥ 400','Kestrel · agent','850.00','Today 18:00','—','#58C7A8'],
+         ['c-info','i-clock','Awaiting proof','Docs migration · pages = 212','Sable · agent','3,100.00','Nov 22','—','#E5B84C'],
+         ['c-warn','i-alert','Disputed','Grant milestone 2 · repo merged','Meridian DAO','5,000.00','Nov 9','0x91ff…7a40','#9CA8B8'],
+         ['c-bad','i-x','Proof failed','Report delivery · rows ≥ 5,000','Okafor Studio','640.00','Nov 12','0x2d00…c1e8','#C98BD0']];
+  document.getElementById('tbody').innerHTML=T.map(function(t){return '<tr><td><span class="chip '+t[0]+'"><svg><use href="#'+t[1]+'"/></svg>'+t[2]+'</span></td><td><div class="w"><span class="t">'+t[3]+'</span></div></td><td class="hide-s"><div class="w"><span class="idn" style="background:conic-gradient(from 20deg,'+t[8]+',var(--sunk),'+t[8]+')"></span>'+t[4]+'</div></td><td class="r num">'+t[5].replace(/(\.\d+)$/,'<span class="dim">$1</span>')+'</td><td class="hide-s dim">'+t[6]+'</td><td class="hide-s hash">'+t[7]+'</td></tr>'}).join('');
+})();
+</script>
+</body>
+</html>
