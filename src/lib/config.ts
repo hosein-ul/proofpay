@@ -6,3 +6,5 @@ export const PRIMUS_DOCS = "https://docs.primuslabs.xyz";
 export const CHAIN = { id: 84532, name: "Base Sepolia", short: "Base Sepolia" } as const;
 export const SECURITY_CONTACT = "security@example.invalid"; // placeholder, replace before launch
 export const BETA_LABEL = "Testnet beta";
+/** Base URL of the demo partner API (see /partner-api). Deploy it publicly for Live proofs; localhost cannot be reached by an attestor. */
+export const PARTNER_API_BASE = process.env.NEXT_PUBLIC_PARTNER_API_URL ?? "https://partner.example";
