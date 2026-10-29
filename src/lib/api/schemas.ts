@@ -44,5 +44,5 @@ export const AccessRequestSchema = z.object({
   useCase: z.string().trim().min(10, "A sentence or two helps us route this.").max(1000),
   volume: z.enum(["<10k", "10k-100k", "100k-1m", ">1m", "unsure"]),
   /** honeypot: real people never fill this */
-  website: z.string().max(0).optional().default(""),
+  website: z.string().max(500).optional().default(""),
 });

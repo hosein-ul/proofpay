@@ -3,8 +3,12 @@
 import { Check, ChevronDown, CircleAlert, Search } from "lucide-react";
 import { Command } from "cmdk";
 import { Checkbox as RCheckbox, Popover, RadioGroup as RRadio, Select as RSelect, Switch as RSwitch, ToggleGroup } from "radix-ui";
-import { forwardRef, useId, useState } from "react";
+import { createContext, forwardRef, useContext, useId, useState } from "react";
 import { cn } from "@/lib/utils";
+
+/** Gives the control inside a Field its id, description and invalid state, so the label is really associated with it. */
+const FieldCtx = createContext<{ id: string; describedBy?: string; invalid: boolean } | null>(null);
+export const useField = () => useContext(FieldCtx);
 
 export function Field({
   label,
@@ -23,21 +27,26 @@ export function Field({
   htmlFor?: string;
   optional?: boolean;
 }) {
+  const auto = useId();
+  const id = htmlFor ?? auto;
+  const describedBy = error || hint ? `${id}-desc` : undefined;
   return (
+    <FieldCtx.Provider value={{ id, describedBy, invalid: !!error }}>
     <div className={cn("grid gap-1.5", className)}>
-      <label htmlFor={htmlFor} className="flex items-baseline gap-2 text-[13px] font-medium text-text">
+      <label htmlFor={id} className="flex items-baseline gap-2 text-[13px] font-medium text-text">
         {label}
         {optional && <span className="text-[12px] font-normal text-text-3">Optional</span>}
       </label>
       {children}
       {error ? (
-        <p role="alert" className="flex items-center gap-1.5 text-[12.5px] text-bad">
+        <p id={describedBy} role="alert" className="flex items-center gap-1.5 text-[12.5px] text-bad">
           <CircleAlert className="size-3.5 shrink-0" aria-hidden /> {error}
         </p>
       ) : hint ? (
-        <p className="text-[12.5px] text-text-3">{hint}</p>
+        <p id={describedBy} className="text-[12.5px] text-text-3">{hint}</p>
       ) : null}
     </div>
+    </FieldCtx.Provider>
   );
 }
 
@@ -48,6 +57,10 @@ export const Input = forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTML
   { className, invalid, unit, leading, ...props },
   ref,
 ) {
+  const f = useField();
+  props.id ??= f?.id;
+  props["aria-describedby"] ??= f?.describedBy;
+  invalid ??= f?.invalid;
   return (
     <div className="relative">
       {leading && <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-3">{leading}</span>}
@@ -58,6 +71,10 @@ export const Input = forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTML
 });
 
 export const Textarea = forwardRef<HTMLTextAreaElement, React.TextareaHTMLAttributes<HTMLTextAreaElement> & { invalid?: boolean }>(function Textarea({ className, invalid, ...props }, ref) {
+  const f = useField();
+  props.id ??= f?.id;
+  props["aria-describedby"] ??= f?.describedBy;
+  invalid ??= f?.invalid;
   return <textarea ref={ref} aria-invalid={invalid || undefined} className={cn(inputBase, "min-h-[88px] resize-y px-3 py-2.5 text-[14px]", className)} {...props} />;
 });
 
@@ -91,9 +108,10 @@ export function NumberInput({ value, onChange, unit, min, max, step = 1, classNa
 
 /* ── select (Radix) ── */
 export function Select<T extends string>({ value, onValueChange, options, placeholder, id, className, "aria-label": al }: { value: T; onValueChange: (v: T) => void; options: { value: T; label: string; hint?: string }[]; placeholder?: string; id?: string; className?: string; "aria-label"?: string }) {
+  const f = useField();
   return (
     <RSelect.Root value={value} onValueChange={(v) => onValueChange(v as T)}>
-      <RSelect.Trigger id={id} aria-label={al} className={cn(inputBase, "inline-flex h-10 items-center justify-between gap-2 px-3 text-left text-[14px] data-[placeholder]:text-text-3", className)}>
+      <RSelect.Trigger id={id ?? f?.id} aria-describedby={f?.describedBy} aria-label={al} className={cn(inputBase, "inline-flex h-10 items-center justify-between gap-2 px-3 text-left text-[14px] data-[placeholder]:text-text-3", className)}>
         <RSelect.Value placeholder={placeholder} />
         <RSelect.Icon>
           <ChevronDown className="size-4 text-text-3" />

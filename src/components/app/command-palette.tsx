@@ -113,7 +113,7 @@ export function CommandPalette({ data }: { data: PaletteData }) {
                 <Command.Item value="toggle theme dark light" onSelect={run(toggle)} className={item}>
                   <Sun className="size-4 text-text-2 dark:hidden" /> <Moon className="hidden size-4 text-text-2 dark:block" /> <span className="flex-1">Toggle theme</span> <kbd className="text-[11px] text-text-3">T</kbd>
                 </Command.Item>
-                <Command.Item value="export ledger csv download" onSelect={run(() => { window.location.href = "/api/ledger?format=csv"; })} className={item}>
+                <Command.Item value="export ledger csv download" onSelect={run(() => { window.location.assign("/api/ledger?format=csv"); })} className={item}>
                   <Download className="size-4 text-text-2" /> <span className="flex-1">Export ledger (CSV)</span>
                 </Command.Item>
                 <Command.Item value="keyboard shortcuts help" onSelect={run(() => setShortcutsOpen(true))} className={item}>

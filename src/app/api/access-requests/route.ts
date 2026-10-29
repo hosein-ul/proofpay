@@ -8,8 +8,9 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   return handle(async () => {
-    limit(req, "access", 5, 10 * 60_000);
     const body = await parseBody(req, AccessRequestSchema);
+    // Rate limit real attempts only; an invalid form costs nothing. Looser outside production so tests can repeat.
+    limit(req, "access", process.env.NODE_ENV === "production" ? 5 : 100, 10 * 60_000);
     // Honeypot filled → pretend success so bots learn nothing.
     if (body.website) return json({ ok: true }, { status: 201 });
     await ready();
