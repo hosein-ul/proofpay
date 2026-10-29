@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Plus } from "lucide-react";
+import { ArrowRight, Banknote, CheckCircle2, CircleDot, Timer } from "lucide-react";
+import { DashboardHero, Pipeline, TopWorkers } from "@/components/app/dashboard-bits";
 import { Onboarding } from "@/components/app/onboarding";
 import { LiveFeed, VolumePanel } from "@/components/app/overview-live";
 import { PageHeader, Panel } from "@/components/app/page-header";
 import { AmountCell, Deadline, WorkerCell } from "@/components/app/task-bits";
-import { Button } from "@/components/ui/button";
 import { Kpi } from "@/components/ui/data";
 import { StatusChip, Chip } from "@/components/ui/chips";
 import { EmptyState } from "@/components/ui/feedback";
 import { duration, formatCompact, splitAmount } from "@/lib/format";
-import { attentionQueue, getMode, getOverview, listEvents, listTasks, listWorkers } from "@/lib/server/repo";
+import { attentionQueue, getMode, getOverview, listEvents, listTasks, listWorkers, workerStats } from "@/lib/server/repo";
 import { conditionText } from "@/lib/domain/condition";
 
 export const metadata: Metadata = { title: "Overview" };
@@ -19,7 +19,7 @@ export const dynamic = "force-dynamic";
 const REASON = { disputed: ["Disputed", "bad"], proof_failed: ["Proof failed", "bad"], expiring: ["Expiring", "warn"], expired: ["Expired", "warn"] } as const;
 
 export default async function OverviewPage() {
-  const [o, att, tasks, events, workers, mode] = await Promise.all([getOverview(30), attentionQueue(), listTasks({ limit: 8 }), listEvents(9, { significant: true }), listWorkers(), getMode()]);
+  const [o, att, tasks, allTasks, events, workers, mode, stats] = await Promise.all([getOverview(30), attentionQueue(), listTasks({ limit: 8 }), listTasks(), listEvents(9, { significant: true }), listWorkers(), getMode(), workerStats()]);
   const wmap = new Map(workers.map((w) => [w.id, w]));
   const esc = splitAmount(o.escrowBalance);
   const set = splitAmount(o.settled30d);
@@ -27,42 +27,23 @@ export default async function OverviewPage() {
   const spark = (k: keyof typeof o.sparks) => o.sparks[k].map((v) => v);
   return (
     <>
-      <PageHeader
-        title="Overview"
-        description="Escrow, settlements and proofs across your workspace. All figures are demo data in Simulation."
-        actions={
-          <>
-            <Button variant="secondary" asChild>
-              <Link href="/app/ledger">Open ledger</Link>
-            </Button>
-            <Button variant="primary" asChild>
-              <Link href="/app/tasks/new">
-                <Plus className="size-4" /> New task
-              </Link>
-            </Button>
-          </>
-        }
-      />
-      <Onboarding />
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-        <div className="col-span-2 lg:col-span-1">
-          <Kpi label="Escrow balance" delta={o.deltas.escrow} deltaLabel={`${o.deltas.escrow >= 0 ? "+" : "−"}${formatCompact(Math.abs(o.deltas.escrow) / 1e6)}`} spark={spark("escrow")} hint="USDC currently held across funded tasks">
-            {esc.whole}
-            <span className="text-text-3">{esc.dec}</span> <span className="text-[12px] font-medium text-text-3">USDC</span>
-          </Kpi>
-        </div>
-        <Kpi label="Funds settled · 30d" delta={o.deltas.settled} deltaLabel={pct(o.deltas.settled)} spark={spark("settled")}>
+      <DashboardHero workspace="Northgate Growth" escrow={o.escrowBalance} open={o.openTasks} success={o.proofSuccessRate} attention={att.length} simulation={mode === "simulation"} />
+      <div className="mt-4">
+        <Onboarding />
+      </div>
+      <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Kpi icon={<Banknote className="size-4" />} label="Funds settled · 30d" delta={o.deltas.settled} deltaLabel={pct(o.deltas.settled)} spark={spark("settled")}>
           {set.whole}
           <span className="text-text-3">{set.dec}</span> <span className="text-[12px] font-medium text-text-3">USDC</span>
         </Kpi>
-        <Kpi label="Open tasks" delta={o.deltas.open} deltaLabel={`${o.deltas.open >= 0 ? "+" : "−"}${Math.abs(o.deltas.open)}`} spark={spark("open")} tone="info">
+        <Kpi icon={<CircleDot className="size-4" />} label="Open tasks" delta={o.deltas.open} deltaLabel={`${o.deltas.open >= 0 ? "+" : "−"}${Math.abs(o.deltas.open)}`} spark={spark("open")} tone="info">
           {o.openTasks}
         </Kpi>
-        <Kpi label="Proof success rate" delta={o.deltas.success} deltaLabel={`${o.deltas.success >= 0 ? "+" : "−"}${Math.abs(o.deltas.success).toFixed(1)} pts`} spark={spark("success")} tone="ok">
+        <Kpi icon={<CheckCircle2 className="size-4" />} label="Proof success rate" delta={o.deltas.success} deltaLabel={`${o.deltas.success >= 0 ? "+" : "−"}${Math.abs(o.deltas.success).toFixed(1)} pts`} spark={spark("success")} tone="ok">
           {o.proofSuccessRate.toFixed(1)}
           <span className="text-text-3">%</span>
         </Kpi>
-        <Kpi label="Median time to settle" delta={o.deltas.settle} deltaLabel={`${o.deltas.settle >= 0 ? "+" : "−"}${Math.abs(Math.round(o.deltas.settle))} min`} good="down" spark={spark("settle")}>
+        <Kpi icon={<Timer className="size-4" />} label="Median time to settle" delta={o.deltas.settle} deltaLabel={`${o.deltas.settle >= 0 ? "+" : "−"}${Math.abs(Math.round(o.deltas.settle))} min`} good="down" spark={spark("settle")}>
           {duration(o.medianSettleMs)}
         </Kpi>
       </div>
@@ -97,6 +78,11 @@ export default async function OverviewPage() {
             </ul>
           )}
         </Panel>
+      </div>
+
+      <div className="mt-4 grid gap-4 lg:grid-cols-12">
+        <Panel title="Task pipeline" description="Where every task is right now" className="lg:col-span-7" flush><Pipeline tasks={allTasks} /></Panel>
+        <Panel title="Top workers" description="By funds earned" className="lg:col-span-5" flush actions={<Link href="/app/workers" className="text-[12.5px] font-medium text-light-text hover:underline">All workers →</Link>}><TopWorkers rows={stats} /></Panel>
       </div>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-12">

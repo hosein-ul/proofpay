@@ -26,15 +26,22 @@ export function Sparkline({ values, className, tone = "light", height = 28 }: { 
 }
 
 /* ── KPI ── */
-export function Kpi({ label, children, delta, deltaLabel, good = "up", spark, tone, hint, vs = "vs 7d ago" }: { vs?: string; label: string; children: React.ReactNode; delta?: number; deltaLabel?: string; good?: "up" | "down"; spark?: number[]; tone?: "light" | "ok" | "info"; hint?: string }) {
+export function Kpi({ label, children, delta, deltaLabel, good = "up", spark, tone, hint, vs = "vs 7d ago", icon }: { vs?: string; label: string; children: React.ReactNode; delta?: number; deltaLabel?: string; good?: "up" | "down"; spark?: number[]; tone?: "light" | "ok" | "info"; hint?: string; icon?: React.ReactNode }) {
   const Icon = delta === undefined || Math.abs(delta) < 0.05 ? Minus : delta > 0 ? ArrowUpRight : ArrowDownRight;
   const positive = delta === undefined ? null : good === "up" ? delta >= 0 : delta <= 0;
   return (
-    <div className="group relative overflow-hidden rounded-panel bg-raised p-4 shadow-raised">
+    <div className="group relative overflow-hidden rounded-panel bg-raised p-4 shadow-raised transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--light),transparent)] opacity-0 transition-opacity duration-300 group-hover:opacity-70" />
-      <p className="text-[12px] font-medium text-text-3" title={hint}>
-        {label}
-      </p>
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-[12px] font-medium text-text-3" title={hint}>
+          {label}
+        </p>
+        {icon && (
+          <span className={cn("grid size-7 place-items-center rounded-control", tone === "ok" ? "bg-ok-quiet text-ok" : tone === "info" ? "bg-info-quiet text-info" : "bg-light-quiet text-light-text")} aria-hidden>
+            {icon}
+          </span>
+        )}
+      </div>
       <p className="num mt-2 text-[26px] leading-none font-semibold tracking-[-0.03em] [font-variation-settings:'wdth'_108]">{children}</p>
       <div className="mt-2 flex items-center gap-1.5 text-[12px]">
         {delta !== undefined && (

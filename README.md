@@ -38,7 +38,7 @@ Demo data is seeded automatically (8 workers, ~36 tasks over ~72 days). `pnpm se
 
 ## What's in the box
 
-- **Web app** (`/app`): overview, task builder (5 steps with a live sentence of the rule), task detail with role-aware actions, **Proof Inspector** (what the source saw / what the attestor signed / what the verifier learns, plus the six named checks), proofs, ledger with a reconciliation check and CSV/print, workers, settings (mode, appearance, members, keys, webhooks, **Trust Model**).
+- **Web app** (`/app`): overview (hero with escrow balance, KPIs, task pipeline, top workers, activity), task builder (5 steps with a live sentence of the rule), task detail with role-aware actions, **Proof Inspector** (what the source saw / what the attestor signed / what the verifier learns, plus the six named checks), proofs, ledger with a reconciliation check and CSV/print, workers, **Proof tools** (verify any Primus attestation in the browser, SHA-256/Keccak hashing, rule-hash and additionParams calculator), settings (mode, Live readiness checklist, appearance, members, keys, webhooks, **Trust Model**).
 - **Website** (`/`): home with an interactive settlement demo, product, three use-case pages, security & Trust Model, developers (quickstart, API reference, error codes), request-access (stored, rate-limited, honeypot), status (real checks), changelog, brand, legal **templates**.
 - **Design system** (`/design`): the "Descent" direction: tokens, type, components, motion rules.
 - **Escrow contract** (`contracts/`): `ProofPayEscrow` + tests with real signatures.
@@ -49,6 +49,7 @@ Demo data is seeded automatically (8 workers, ~36 tasks over ~72 days). `pnpm se
 |---|---|
 | ![Task builder](docs/screenshots/s-builder.png) | ![Proof inspector](docs/screenshots/s-proof.png) |
 | ![Ledger](docs/screenshots/s-ledger.png) | ![Task detail](docs/screenshots/s-task-detail.png) |
+| ![Proof tools](docs/screenshots/s-tools.png) | ![Dashboard, dark](docs/screenshots/s-app-dark.png) |
 
 Responsive from 1440 to 390, light and dark:
 
@@ -79,7 +80,7 @@ Task states: `draft → funded → awaiting_proof → proving → verified → s
 2. Deploy `partner-api/` somewhere public (an attestor cannot reach localhost).
 3. Set, server-side only (see `.env.example`): `PRIMUS_APP_ID`, `PRIMUS_APP_SECRET`, `PRIMUS_TEMPLATE_ID`, `PRIMUS_ATTESTORS`.
 4. Contracts, on **your** machine with a throwaway testnet key (never commit or paste it): `PRIMUS_VERIFIER=0x… PRIVATE_KEY=… forge script script/Deploy.s.sol --rpc-url $BASE_SEPOLIA_RPC_URL --broadcast`. Re-check Primus' verifier address in their docs first.
-5. Settings → Environment → **Live (testnet)**. The worker's browser calls `POST /api/tasks/{id}/proof/prepare` for a signed request, runs the Primus SDK, then posts the attestation to `/proof`.
+5. Settings → Environment shows which variables are set; once the first four are, switch to **Live (testnet)**. On a Live task the worker presses *Start Primus attestation*: the browser calls `POST /api/tasks/{id}/proof/prepare` for a signed request, runs the Primus SDK (`init` → `startAttestation` → `verifyAttestation`), and posts the attestation to `/proof`. Paste any attestation into **Proof tools** to check its digest and signer.
 
 Secrets never reach the client bundle: `appSecret` is used only in `src/lib/server/primus.ts` (`server-only`).
 

@@ -16,6 +16,7 @@ import { TrustModel } from "./trust-model";
 interface Props {
   mode: Mode;
   liveConfigured: boolean;
+  readiness: { key: string; ok: boolean; why: string }[];
   members: { id: string; name: string; email: string; role: string; lastActive: string | null }[];
   keys: { id: string; name: string; prefix: string; scope: string; createdAt: string; lastUsed: string | null }[];
   webhooks: { id: string; url: string; events: string[]; active: boolean }[];
@@ -31,7 +32,7 @@ const SECTIONS = [
   ["trust-model", "Trust Model"],
 ] as const;
 
-export function SettingsView({ mode, liveConfigured, members, keys, webhooks, deliveries }: Props) {
+export function SettingsView({ mode, liveConfigured, readiness, members, keys, webhooks, deliveries }: Props) {
   const router = useRouter();
   const { theme, setTheme, density, setDensity } = useTheme();
 
@@ -69,7 +70,16 @@ export function SettingsView({ mode, liveConfigured, members, keys, webhooks, de
             <ModeBadge mode={mode} />
             <Segmented aria-label="Mode" value={mode} onValueChange={(v) => setMode.mutate(v as Mode)} options={[{ value: "simulation", label: "Simulation" }, { value: "live", label: "Live (testnet)" }]} />
           </div>
-          {!liveConfigured && <p className="mt-3 text-[13px] text-text-2">Live needs <code className="mono text-[12px]">PRIMUS_APP_ID</code> and <code className="mono text-[12px]">PRIMUS_APP_SECRET</code>, <code className="mono text-[12px]">PRIMUS_TEMPLATE_ID</code> and <code className="mono text-[12px]">PRIMUS_ATTESTORS</code> set on the server. They are never sent to the browser.</p>}
+          <ul className="mt-4 grid gap-1.5 rounded-panel bg-sunk p-4 text-[13px]" aria-label="Live mode readiness">
+            {readiness.map((r) => (
+              <li key={r.key} className="flex items-center gap-2.5">
+                <span className={cn("grid size-4 shrink-0 place-items-center rounded-full text-[10px] font-bold", r.ok ? "bg-ok text-white" : "bg-line-strong text-text-2")} aria-hidden>{r.ok ? "✓" : ""}</span>
+                <code className="mono text-[12px]">{r.key}</code>
+                <span className="text-text-3">{r.ok ? "set" : `missing · ${r.why}`}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2 text-[12.5px] text-text-3">{liveConfigured ? "Live can be switched on." : "Switching to Live is blocked until the first four are set. Secrets stay on the server."} See the README, Live mode.</p>
           <div className="mt-4 flex items-center gap-3 border-t border-line pt-4">
             <Button variant="secondary" size="sm" loading={reset.isPending} onClick={() => reset.mutate()}>Reset demo data</Button>
             <span className="text-[12.5px] text-text-3">Restores the seeded workspace. Simulation only.</span>

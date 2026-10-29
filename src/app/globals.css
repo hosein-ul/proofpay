@@ -261,3 +261,16 @@ button {
   12%, 30% { stroke: var(--light); stroke-width: 1.6; }
   50% { stroke: var(--line-strong); stroke-width: 1; }
 }
+
+.pp-rise-in {
+  animation: pp-rise 480ms var(--ease-out, cubic-bezier(.16, 1, .3, 1)) both;
+  animation-delay: calc(var(--d, 0) * 70ms);
+}
+@keyframes pp-beam-sweep {
+  0%, 100% { opacity: 0.35; transform: translateY(0); }
+  50% { opacity: 0.9; transform: translateY(8px); }
+}
+.pp-beam-sweep { animation: pp-beam-sweep 5s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .pp-rise-in, .pp-beam-sweep { animation: none; }
+}

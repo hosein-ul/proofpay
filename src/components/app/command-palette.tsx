@@ -1,8 +1,8 @@
 "use client";
 
-import { Command } from "cmdk";
+import {  Command } from "cmdk";
 import { useRouter } from "next/navigation";
-import { Download, FlaskConical, Keyboard, LayoutGrid, ListChecks, Fingerprint, Moon, Plus, Receipt, Search, Settings, Sun, Users, CornerDownLeft } from "lucide-react";
+import { Download, FlaskConical, Keyboard, LayoutGrid, ListChecks, Fingerprint, Moon, Plus, Receipt, Search, Settings, Sun, Users, Wrench, CornerDownLeft } from "lucide-react";
 import { Dialog } from "radix-ui";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -65,6 +65,7 @@ export function CommandPalette({ data }: { data: PaletteData }) {
     { id: "proofs", label: "Proofs", href: "/app/proofs", icon: Fingerprint, k: "G P" },
     { id: "ledger", label: "Ledger and audit", href: "/app/ledger", icon: Receipt, k: "G L" },
     { id: "workers", label: "Workers", href: "/app/workers", icon: Users, k: "G W" },
+    { id: "tools", label: "Proof tools", href: "/app/tools", icon: Wrench, k: "G T" },
     { id: "settings", label: "Settings", href: "/app/settings", icon: Settings, k: "G S" },
   ];
   const recentItems = recents

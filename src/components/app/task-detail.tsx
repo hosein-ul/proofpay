@@ -21,6 +21,7 @@ import { isTerminal } from "@/lib/domain/state-machine";
 import { OP_LABEL, STATE_LABEL, STATE_TONE, type Attestation, type LedgerEntry, type ProofErrorCode, type Task, type TaskEvent, type VerificationResult, type Worker } from "@/lib/domain/types";
 import { absoluteDateTime, splitAmount } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { runPrimusAttestation } from "@/lib/client/primus";
 import { markOnboarding } from "./onboarding";
 import { useApp } from "./context";
 import { StateRail } from "./state-rail";
@@ -337,8 +338,13 @@ function ProofDialog({ open, onOpenChange, task, worker, onDone }: { open: boole
   const [value, setValue] = useState<number | "">("");
   const v = value === "" ? (fail ? failValue : passValue) : value;
   const [err, setErr] = useState<{ code: ProofErrorCode; msg: string } | null>(null);
+  const live = task.mode === "live";
   const m = useMutation({
-    mutationFn: () => call(`/api/tasks/${task.id}/proof`, { value: v, actor: worker.name }, crypto.randomUUID()),
+    mutationFn: async () => {
+      // Live: the Primus extension makes the proof in this browser; we only forward what it returns.
+      if (live) return call(`/api/tasks/${task.id}/proof`, { attestation: await runPrimusAttestation(task.id), actor: worker.name }, crypto.randomUUID());
+      return call(`/api/tasks/${task.id}/proof`, { value: v, actor: worker.name }, crypto.randomUUID());
+    },
     onSuccess: (r: { attestationId: string; settled: boolean; verification: VerificationResult }) => {
       markOnboarding("prove");
       if (r.settled) {
@@ -359,10 +365,23 @@ function ProofDialog({ open, onOpenChange, task, worker, onDone }: { open: boole
       open={open}
       onOpenChange={(o) => { onOpenChange(o); if (!o) setErr(null); }}
       title="Generate a proof"
-      description={`As ${worker.name}, attest what the source reports. The rule needs ${conditionText(c)}.`}
-      footer={<><Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button><Button variant="primary" loading={m.isPending} onClick={() => { setErr(null); m.mutate(); }}><Fingerprint className="size-4" /> Generate and verify</Button></>}
+      description={live ? `Prove ${conditionText(c)} with Primus. The proof is made in your browser by the Primus extension.` : `As ${worker.name}, attest what the source reports. The rule needs ${conditionText(c)}.`}
+      footer={<><Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button><Button variant="primary" loading={m.isPending} onClick={() => { setErr(null); m.mutate(); }}><Fingerprint className="size-4" /> {live ? "Start Primus attestation" : "Generate and verify"}</Button></>}
     >
       <div className="grid gap-4">
+        {live ? (
+          <>
+            <Callout tone="info" title="Live, on Base Sepolia (testnet)">
+              The Primus browser extension opens the data source, runs the TLS session and returns a signed attestation. We re-check it with the same six checks before releasing anything.
+            </Callout>
+            <ol className="grid gap-1.5 pl-5 text-[13.5px] text-text-2 [&_li]:list-decimal">
+              <li>Install the Primus extension if you have not.</li>
+              <li>Press Start. Approve the request in the extension.</li>
+              <li>Wait for the attestation. Do not close this window.</li>
+            </ol>
+          </>
+        ) : (
+          <>
         <Callout tone="sim" title="Simulation">
           The demo source reports the value below. The proof is signed by a local test attestor and labelled as synthetic. The checks run exactly as in Live.
         </Callout>
@@ -373,6 +392,8 @@ function ProofDialog({ open, onOpenChange, task, worker, onDone }: { open: boole
           <Switch checked={fail} onCheckedChange={(b) => { setFail(b); setValue(""); }} label="Make the proof fail" />
           Try a proof that does not meet the rule
         </label>
+          </>
+        )}
         {err && (
           <div role="alert" className="rounded-panel bg-bad-quiet p-3.5 text-[13px] text-bad">
             <p className="font-semibold">{PROOF_ERRORS[err.code].title}</p>

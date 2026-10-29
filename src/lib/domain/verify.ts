@@ -1,5 +1,5 @@
 import { getAddress, keccak256, encodePacked } from "viem";
-import { attestationDigest, recoverSigner } from "./attestation";
+import { attestationDigest, recoverSigner } from "./digest";
 import { attConditionsFor, taskAdditionParams } from "./condition";
 import type { Attestation, ProofErrorCode, Task, VerificationResult, VerifyStep, Worker } from "./types";
 

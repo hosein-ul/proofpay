@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Building2, ChevronsUpDown, Command as CommandIcon, Fingerprint, History, Keyboard, LayoutGrid, ListChecks, Menu as MenuIcon, Monitor, Moon, PanelLeft, Plus, Receipt, Settings, Sun, Users, BookOpen, LogOut, Check } from "lucide-react";
+import { Bell, Building2, ChevronsUpDown, Command as CommandIcon, Fingerprint, History, Keyboard, LayoutGrid, ListChecks, Menu as MenuIcon, Monitor, Moon, PanelLeft, Plus, Receipt, Settings, Sun, Users, BookOpen, LogOut, Check, Wrench } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -27,6 +27,7 @@ const NAV: { href: string; label: string; icon: React.ComponentType<{ className?
   { href: "/app/proofs", label: "Proofs", icon: Fingerprint },
   { href: "/app/ledger", label: "Ledger", icon: Receipt },
   { href: "/app/workers", label: "Workers", icon: Users },
+  { href: "/app/tools", label: "Proof tools", icon: Wrench },
   { href: "/app/settings", label: "Settings", icon: Settings },
 ];
 

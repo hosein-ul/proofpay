@@ -50,7 +50,7 @@ export function Callout({ tone = "info", title, children, action, className }: {
       <Icon className="mt-0.5 size-4 shrink-0" aria-hidden />
       <div className="grid flex-1 gap-0.5">
         {title && <p className="font-semibold">{title}</p>}
-        {children && <div className="text-[13px] leading-relaxed opacity-90 [&_a]:underline">{children}</div>}
+        {children && <div className="text-[13px] leading-relaxed [&_a]:underline">{children}</div>}
       </div>
       {action}
     </div>

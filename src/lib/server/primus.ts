@@ -16,7 +16,7 @@ export function liveConfig() {
  * The secret stays on the server; the browser only receives the signed string. Calls `PrimusZKTLS.init/generateRequestParams/sign`
  * exactly as typed in @primuslabs/zktls-js-sdk@0.3.15. Not exercised against Primus' service in this repo (D6).
  */
-export async function signAttestationRequest(task: Task, worker: Worker): Promise<{ attRequest: string; templateId: string }> {
+export async function signAttestationRequest(task: Task, worker: Worker): Promise<{ attRequest: string; templateId: string; appId: string }> {
   const cfg = liveConfig();
   if (!cfg.ready) throw new DomainError("bad_request", "Live mode needs PRIMUS_APP_ID, PRIMUS_APP_SECRET, PRIMUS_TEMPLATE_ID and PRIMUS_ATTESTORS on the server.", 400);
   const { PrimusZKTLS } = await import("@primuslabs/zktls-js-sdk");
@@ -27,5 +27,5 @@ export async function signAttestationRequest(task: Task, worker: Worker): Promis
     additionParams: taskAdditionParams(task.id, task.conditionHash),
   });
   const attRequest = await zk.sign(req.toJsonString());
-  return { attRequest, templateId: cfg.templateId! };
+  return { attRequest, templateId: cfg.templateId!, appId: cfg.appId! };
 }

@@ -3,7 +3,6 @@
 import { Check, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { PlateStack } from "@/components/brand/plate-stack";
 import { Button } from "@/components/ui/button";
 
 const KEY = "pp-onboard";
@@ -43,37 +42,35 @@ export function Onboarding() {
   }, []);
   if (hidden) return null;
   const next = STEPS.find((s) => !done.includes(s.id));
+  const count = STEPS.filter((s) => done.includes(s.id)).length;
   return (
-    <section aria-label="Getting started" className="relative mb-6 [html[data-onboard-hidden]_&]:hidden overflow-hidden rounded-stage bg-raised shadow-raised">
-      <div className="dots pointer-events-none absolute inset-y-0 right-0 w-1/2 opacity-60 [mask-image:linear-gradient(90deg,transparent,#000)]" aria-hidden />
-      <div className="relative grid gap-5 p-5 md:grid-cols-[1fr_auto] md:items-center">
-        <div className="grid gap-4">
-          <div>
-            <h2 className="text-[17px] font-semibold tracking-[-0.02em]">Try a settlement in five steps</h2>
-            <p className="mt-1 max-w-[60ch] text-[13.5px] text-text-2">This is a demo workspace in Simulation. Create a task, fund it, prove it, and watch the escrow release. Nothing here moves real money.</p>
-          </div>
-          <ol className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
-            {STEPS.map((s, i) => {
-              const d = done.includes(s.id);
-              const on = next?.id === s.id;
-              return (
-                <li key={s.id} className={`rounded-panel p-3 text-[13px] ${on ? "bg-light-quiet shadow-[0_0_0_1px_color-mix(in_oklab,var(--light)_50%,transparent)]" : "bg-sunk"}`}>
-                  <div className="flex items-center gap-2">
-                    <span className={`grid size-5 place-items-center rounded-full text-[11px] font-semibold ${d ? "bg-light text-on-light" : "bg-raised text-text-3 shadow-[0_0_0_1px_var(--line-strong)]"}`}>{d ? <Check className="size-3" strokeWidth={3} /> : i + 1}</span>
-                    <span className="font-medium">{s.title}</span>
-                  </div>
-                  <p className="mt-1.5 text-[12.5px] text-text-2">{s.body}</p>
-                  <Link href={s.href} className="mt-2 inline-block text-[12.5px] font-medium text-light-text underline-offset-2 hover:underline">
-                    {s.cta} →
-                  </Link>
-                </li>
-              );
-            })}
-          </ol>
+    <section aria-label="Getting started" className="pp-rise-in relative rounded-panel bg-raised p-4 shadow-raised [html[data-onboard-hidden]_&]:hidden" style={{ ["--d" as string]: 1 }}>
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-3 pr-9">
+        <div className="min-w-[200px]">
+          <h2 className="text-[14px] font-semibold tracking-[-0.01em]">Try a settlement in five steps</h2>
+          <p className="mt-0.5 text-[12.5px] text-text-2">{count === STEPS.length ? "You have done every step. Nice." : `${count} of ${STEPS.length} done. Nothing here moves real money.`}</p>
         </div>
-        <PlateStack count={4} size={120} className="hidden md:block" />
+        <ol className="flex flex-1 flex-wrap items-center gap-1.5">
+          {STEPS.map((s, i) => {
+            const d = done.includes(s.id);
+            const on = next?.id === s.id;
+            return (
+              <li key={s.id}>
+                <Link href={s.href} title={s.body} className={`inline-flex h-8 items-center gap-2 rounded-full px-3 text-[12.5px] font-medium transition-colors ${on ? "bg-light-quiet text-light-text shadow-[0_0_0_1px_color-mix(in_oklab,var(--light)_50%,transparent)]" : d ? "bg-sunk text-text-2" : "bg-sunk text-text-2 hover:bg-lift"}`}>
+                  <span className={`grid size-4 place-items-center rounded-full text-[10px] font-semibold ${d ? "bg-light text-on-light" : "bg-raised text-text-3 shadow-[0_0_0_1px_var(--line-strong)]"}`}>{d ? <Check className="size-2.5" strokeWidth={3.5} /> : i + 1}</span>
+                  {s.title}
+                </Link>
+              </li>
+            );
+          })}
+        </ol>
+        {next && (
+          <Link href={next.href} className="text-[13px] font-medium text-light-text hover:underline">
+            {next.cta} →
+          </Link>
+        )}
       </div>
-      <Button variant="ghost" size="icon-sm" className="absolute right-3 top-3" aria-label="Dismiss getting started" onClick={() => { try { localStorage.setItem("pp-onboard-hidden", "1"); document.documentElement.dataset.onboardHidden = "1"; } catch {} setHidden(true); }}>
+      <Button variant="ghost" size="icon-sm" className="absolute right-2.5 top-2.5" aria-label="Dismiss getting started" onClick={() => { try { localStorage.setItem("pp-onboard-hidden", "1"); document.documentElement.dataset.onboardHidden = "1"; } catch {} setHidden(true); }}>
         <X className="size-4" />
       </Button>
     </section>

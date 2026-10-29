@@ -10,7 +10,7 @@ import { Hash, Time } from "@/components/ui/copy";
 import { JsonViewer } from "@/components/ui/json-viewer";
 import { Tip } from "@/components/ui/overlay";
 import { Callout } from "@/components/ui/feedback";
-import { attestationDigest, encodeRequest } from "@/lib/domain/attestation";
+import { attestationDigest, encodeRequest } from "@/lib/domain/digest";
 import { conditionText } from "@/lib/domain/condition";
 import { PROOF_ERRORS } from "@/lib/domain/errors";
 import type { Attestation, Task, VerificationResult, Worker } from "@/lib/domain/types";

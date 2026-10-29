@@ -108,3 +108,18 @@ test("command palette opens with Ctrl+K and navigates", async ({ page }) => {
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/app\/tasks\/new/);
 });
+
+test("proof tools: verify a simulated attestation, hash text, rule hash", async ({ page }) => {
+  await page.goto("/app/tools");
+  await page.getByRole("button", { name: "Load a simulated example" }).click();
+  await expect(page.getByText("Signature recovers to an address")).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByText("0x70997970C51812dc3A010C7d01b50e0d17dc79C8").first()).toBeVisible();
+  await expect(page.getByText("On your trusted list")).toBeVisible();
+
+  await page.getByRole("tab", { name: /Hash text/ }).click();
+  await page.getByLabel("Input", { exact: true }).fill("abc");
+  await expect(page.getByText("0xba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad")).toBeVisible();
+
+  await page.getByRole("tab", { name: /Rule hash/ }).click();
+  await expect(page.getByText(/^0x[0-9a-f]{64}$/).first()).toBeVisible();
+});
