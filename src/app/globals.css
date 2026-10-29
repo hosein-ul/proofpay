@@ -1,0 +1,261 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme inline {
+  --color-ground: var(--ground);
+  --color-raised: var(--raised);
+  --color-sunk: var(--sunk);
+  --color-lift: var(--lift);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-text: var(--text);
+  --color-text-2: var(--text-2);
+  --color-text-3: var(--text-3);
+  --color-light: var(--light);
+  --color-light-text: var(--light-text);
+  --color-on-light: var(--on-light);
+  --color-light-quiet: var(--light-quiet);
+  --color-ok: var(--ok);
+  --color-ok-quiet: var(--ok-quiet);
+  --color-warn: var(--warn);
+  --color-warn-quiet: var(--warn-quiet);
+  --color-bad: var(--bad);
+  --color-bad-quiet: var(--bad-quiet);
+  --color-info: var(--info);
+  --color-info-quiet: var(--info-quiet);
+  --color-ink-band: var(--ink-band);
+  --color-ink-band-2: var(--ink-band-2);
+  --color-ink-band-text: var(--ink-band-text);
+  --color-ink-band-text-2: var(--ink-band-text-2);
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jbmono), ui-monospace, "SF Mono", Menlo, monospace;
+  --radius-chip: var(--radius-chip);
+  --radius-control: var(--radius-control);
+  --radius-panel: var(--radius-panel);
+  --radius-stage: var(--radius-stage);
+  --shadow-rest: var(--shadow-rest);
+  --shadow-raised: var(--shadow-raised);
+  --shadow-float: var(--shadow-float);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px;
+}
+body {
+  background: var(--ground);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  font-variation-settings: "wdth" 100;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  min-height: 100dvh;
+}
+.app-root {
+  font-size: 13.5px;
+}
+::selection {
+  background: var(--light-quiet);
+  color: var(--text);
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button {
+  font: inherit;
+}
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── type roles ── */
+.t-display {
+  font-size: clamp(44px, 6.4vw, 96px);
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+  font-weight: 560;
+  font-variation-settings: "wdth" 122;
+  text-wrap: balance;
+}
+.t-h1 {
+  font-size: clamp(34px, 4vw, 56px);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  font-weight: 560;
+  font-variation-settings: "wdth" 118;
+  text-wrap: balance;
+}
+.t-h2 {
+  font-size: clamp(28px, 3.4vw, 44px);
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+  font-weight: 560;
+  font-variation-settings: "wdth" 114;
+  text-wrap: balance;
+}
+.t-h3 {
+  font-size: 22px;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  font-weight: 600;
+  font-variation-settings: "wdth" 108;
+}
+.t-lg {
+  font-size: 18px;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+.t-small {
+  font-size: 12.5px;
+  line-height: 1.4;
+  font-weight: 500;
+}
+.t-label {
+  font-size: 12px;
+  line-height: 1.2;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+.num {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  letter-spacing: 0;
+}
+
+/* the light: the one key phrase on a page */
+.lit-text {
+  background: linear-gradient(180deg, #f2b53f, #c47a00 92%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+:root[data-theme="dark"] .lit-text {
+  background: linear-gradient(180deg, var(--light-hi), var(--light) 85%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .lit-text {
+    background: linear-gradient(180deg, var(--light-hi), var(--light) 85%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+}
+
+/* grain used on atmospheres only */
+.grain {
+  position: relative;
+}
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
+}
+
+.dots {
+  background-image: radial-gradient(var(--line-strong) 1px, transparent 1.2px);
+  background-size: 22px 22px;
+}
+.hair {
+  box-shadow: var(--shadow-rest);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+@keyframes pp-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+@keyframes pp-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes pp-slide-right {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+}
+@keyframes pp-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+@keyframes pp-ping {
+  0% {
+    box-shadow: 0 0 0 0 var(--light-glow);
+  }
+  70% {
+    box-shadow: 0 0 0 10px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+@keyframes pp-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--sunk) 25%, var(--lift) 37%, var(--sunk) 63%);
+  background-size: 200% 100%;
+  animation: pp-shimmer 1.4s linear infinite;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* plate stack (empty states, loaders, 404): packet descends, plates light as it passes */
+.pp-stack-packet {
+  animation: pp-descend 3.6s var(--ease-in-out) infinite;
+  filter: drop-shadow(0 0 5px var(--light-glow));
+}
+.pp-stack-top[data-on] {
+  animation: pp-plate-lit 3.6s var(--ease-in-out) infinite;
+  animation-delay: calc(var(--i) / var(--n) * 2.4s);
+}
+@keyframes pp-descend {
+  0% { transform: translateY(0); opacity: 0; }
+  8% { opacity: 1; }
+  70% { transform: translateY(var(--travel)); opacity: 1; }
+  80%, 100% { transform: translateY(var(--travel)); opacity: 0; }
+}
+@keyframes pp-plate-lit {
+  0%, 100% { stroke: var(--line-strong); stroke-width: 1; }
+  12%, 30% { stroke: var(--light); stroke-width: 1.6; }
+  50% { stroke: var(--line-strong); stroke-width: 1; }
+}

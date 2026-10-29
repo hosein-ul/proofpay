@@ -1,0 +1,157 @@
+/* ProofPay — Descent tokens. Source of truth: .design/direction.md
+   Three layers: primitives (--navy-*), semantic roles (--ground…), component tokens (--btn-h…).
+   Components never reference primitives. Light is the default; dark is a designed equal. */
+
+:root {
+  /* motion */
+  --dur-1: 90ms;
+  --dur-2: 160ms;
+  --dur-3: 240ms;
+  --dur-4: 400ms;
+  --dur-5: 700ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-snap: cubic-bezier(0.2, 0, 0, 1);
+
+  /* shape */
+  --radius-chip: 6px;
+  --radius-control: 8px;
+  --radius-panel: 14px;
+  --radius-stage: 22px;
+
+  /* sizes */
+  --control-h: 40px;
+  --control-h-sm: 34px;
+  --row-h: 40px;
+  --header-h: 64px;
+  --sidebar-w: 232px;
+  --sidebar-w-collapsed: 64px;
+
+  /* light (default) */
+  --ground: #edf1f8;
+  --raised: #ffffff;
+  --sunk: #e3e9f4;
+  --lift: #f6f8fc;
+  --line: rgb(10 21 48 / 0.11);
+  --line-strong: rgb(10 21 48 / 0.22);
+  --text: #0a1530;
+  --text-2: #41506e;
+  --text-3: #76839e;
+  --light: #e39a16;
+  --light-hi: #ffd98a;
+  --light-text: #8f5200;
+  --on-light: #1b1405;
+  --light-quiet: rgb(227 154 22 / 0.14);
+  --light-glow: rgb(227 154 22 / 0.32);
+  --ok: #0e7f59;
+  --ok-quiet: #ddf3ea;
+  --warn: #9a5b05;
+  --warn-quiet: #fbeed2;
+  --bad: #b8362d;
+  --bad-quiet: #fbe4e1;
+  --info: #2d56c9;
+  --info-quiet: #e3eafb;
+  --focus: #e39a16;
+  --overlay: rgb(7 14 30 / 0.5);
+  --top: rgb(255 255 255 / 0.9);
+  --ink-band: #0a1326;
+  --ink-band-2: #0f1a33;
+  --ink-band-text: #ebf0ff;
+  --ink-band-text-2: #a2b2d4;
+  --ink-band-line: rgb(170 196 255 / 0.12);
+
+  /* plates (computed stack) */
+  --slab-top: #ffffff;
+  --slab-top-2: #f1f4fa;
+  --slab-l: #d7dfee;
+  --slab-r: #bfcbe2;
+
+  --shadow-rest: 0 1px 0 var(--top) inset, 0 0 0 1px var(--line);
+  --shadow-raised: 0 1px 0 var(--top) inset, 0 0 0 1px var(--line), 0 1px 2px rgb(10 21 48 / 0.05), 0 14px 34px -14px rgb(10 21 48 / 0.18);
+  --shadow-float: 0 1px 0 var(--top) inset, 0 0 0 1px var(--line-strong), 0 24px 60px -18px rgb(10 21 48 / 0.35);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0a1326;
+    --raised: #0f1a33;
+    --sunk: #070e1e;
+    --lift: #13223f;
+    --line: rgb(170 196 255 / 0.11);
+    --line-strong: rgb(170 196 255 / 0.2);
+    --text: #ebf0ff;
+    --text-2: #a2b2d4;
+    --text-3: #6a7da6;
+    --light: #ffe3a6;
+    --light-hi: #fff8e6;
+    --light-text: #ffe3a6;
+    --on-light: #1b1405;
+    --light-quiet: rgb(255 227 166 / 0.12);
+    --light-glow: rgb(255 205 110 / 0.42);
+    --ok: #5fe1b0;
+    --ok-quiet: rgb(95 225 176 / 0.12);
+    --warn: #f7bc5e;
+    --warn-quiet: rgb(247 188 94 / 0.13);
+    --bad: #ff8f86;
+    --bad-quiet: rgb(255 143 134 / 0.13);
+    --info: #86a9ff;
+    --info-quiet: rgb(134 169 255 / 0.13);
+    --focus: #ffe3a6;
+    --overlay: rgb(3 7 16 / 0.62);
+    --top: rgb(255 255 255 / 0.07);
+    --ink-band: #070e1e;
+    --ink-band-2: #0a1326;
+    --slab-top: #1b3158;
+    --slab-top-2: #152747;
+    --slab-l: #0f1e3a;
+    --slab-r: #0a1630;
+    --shadow-raised: 0 1px 0 var(--top) inset, 0 0 0 1px var(--line), 0 30px 60px -28px rgb(0 0 0 / 0.7);
+    --shadow-float: 0 1px 0 var(--top) inset, 0 0 0 1px var(--line-strong), 0 30px 70px -20px rgb(0 0 0 / 0.8);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground: #0a1326;
+  --raised: #0f1a33;
+  --sunk: #070e1e;
+  --lift: #13223f;
+  --line: rgb(170 196 255 / 0.11);
+  --line-strong: rgb(170 196 255 / 0.2);
+  --text: #ebf0ff;
+  --text-2: #a2b2d4;
+  --text-3: #6a7da6;
+  --light: #ffe3a6;
+  --light-hi: #fff8e6;
+  --light-text: #ffe3a6;
+  --on-light: #1b1405;
+  --light-quiet: rgb(255 227 166 / 0.12);
+  --light-glow: rgb(255 205 110 / 0.42);
+  --ok: #5fe1b0;
+  --ok-quiet: rgb(95 225 176 / 0.12);
+  --warn: #f7bc5e;
+  --warn-quiet: rgb(247 188 94 / 0.13);
+  --bad: #ff8f86;
+  --bad-quiet: rgb(255 143 134 / 0.13);
+  --info: #86a9ff;
+  --info-quiet: rgb(134 169 255 / 0.13);
+  --focus: #ffe3a6;
+  --overlay: rgb(3 7 16 / 0.62);
+  --top: rgb(255 255 255 / 0.07);
+  --ink-band: #070e1e;
+  --ink-band-2: #0a1326;
+  --slab-top: #1b3158;
+  --slab-top-2: #152747;
+  --slab-l: #0f1e3a;
+  --slab-r: #0a1630;
+  --shadow-raised: 0 1px 0 var(--top) inset, 0 0 0 1px var(--line), 0 30px 60px -28px rgb(0 0 0 / 0.7);
+  --shadow-float: 0 1px 0 var(--top) inset, 0 0 0 1px var(--line-strong), 0 30px 70px -20px rgb(0 0 0 / 0.8);
+  color-scheme: dark;
+}
+
+/* Density: the app can switch rows between comfortable and compact. */
+:root[data-density="compact"] {
+  --row-h: 32px;
+  --control-h: 34px;
+}
