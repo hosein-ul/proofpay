@@ -121,7 +121,7 @@ export default function Home() {
             <p className="text-[16px] text-text-2">Create a task, fund it and submit a proof over plain HTTP. Every write takes an idempotency key.</p>
             <Button variant="secondary" asChild className="w-fit"><Link href="/developers">Read the docs</Link></Button>
           </div>
-          <pre className="mono overflow-x-auto rounded-stage bg-[#0B1424] p-5 text-[12.5px] leading-relaxed text-[#D6DEEE]"><code>{`curl -X POST $BASE/api/tasks/tsk_7Q2M/fund \\
+          <pre tabIndex={0} className="mono overflow-x-auto rounded-stage bg-[#0B1424] p-5 text-[12.5px] leading-relaxed text-[#D6DEEE]"><code>{`curl -X POST $BASE/api/tasks/tsk_7Q2M/fund \\
   -H "Idempotency-Key: fund-tsk_7Q2M"
 
 # → { "task": { "state": "funded", ... } }`}</code></pre>

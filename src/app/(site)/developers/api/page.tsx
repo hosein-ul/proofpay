@@ -16,7 +16,7 @@ export default function ApiRef() {
             <article key={e.method + e.path} id={`${e.method}-${e.path}`} className="grid gap-2 rounded-panel bg-raised p-5 shadow-rest">
               <h2 className="flex flex-wrap items-center gap-3 text-[15px]"><span className={cn("mono rounded px-1.5 py-0.5 text-[12px] font-semibold", e.method === "GET" ? "bg-info-quiet text-info" : "bg-ok-quiet text-ok")}>{e.method}</span><code className="mono text-[14px]">{e.path}</code></h2>
               <p className="text-[14.5px] text-text-2">{e.summary}</p>
-              {e.body && <pre className="mono overflow-x-auto rounded-control bg-sunk p-3 text-[12.5px]"><code>{e.body}</code></pre>}
+              {e.body && <pre tabIndex={0} className="mono overflow-x-auto rounded-control bg-sunk p-3 text-[12.5px]"><code>{e.body}</code></pre>}
               {e.notes && <p className="text-[13px] text-text-3">{e.notes}</p>}
             </article>
           ))}

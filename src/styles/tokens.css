@@ -36,14 +36,14 @@
   --line-strong: rgb(10 21 48 / 0.22);
   --text: #0a1530;
   --text-2: #41506e;
-  --text-3: #76839e;
+  --text-3: #5a6782;
   --light: #e39a16;
   --light-hi: #ffd98a;
   --light-text: #8f5200;
   --on-light: #1b1405;
   --light-quiet: rgb(227 154 22 / 0.14);
   --light-glow: rgb(227 154 22 / 0.32);
-  --ok: #0e7f59;
+  --ok: #0b7050;
   --ok-quiet: #ddf3ea;
   --warn: #9a5b05;
   --warn-quiet: #fbeed2;
@@ -82,7 +82,7 @@
     --line-strong: rgb(170 196 255 / 0.2);
     --text: #ebf0ff;
     --text-2: #a2b2d4;
-    --text-3: #6a7da6;
+    --text-3: #788bb4;
     --light: #ffe3a6;
     --light-hi: #fff8e6;
     --light-text: #ffe3a6;
@@ -121,7 +121,7 @@
   --line-strong: rgb(170 196 255 / 0.2);
   --text: #ebf0ff;
   --text-2: #a2b2d4;
-  --text-3: #6a7da6;
+  --text-3: #788bb4;
   --light: #ffe3a6;
   --light-hi: #fff8e6;
   --light-text: #ffe3a6;

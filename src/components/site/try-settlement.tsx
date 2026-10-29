@@ -73,7 +73,7 @@ export function TrySettlement() {
               const fail = bad && i === 3 && shown;
               const pass = shown && !(bad && i >= 3);
               return (
-                <li key={c} className={cn("flex items-center gap-2.5 text-[13.5px] transition-opacity", !shown && "opacity-40")} style={{ transitionDelay: shown ? `${i * 120}ms` : "0ms" }}>
+                <li key={c} className={cn("flex items-center gap-2.5 text-[13.5px] transition-opacity", !shown && "text-text-3")} style={{ transitionDelay: shown ? `${i * 120}ms` : "0ms" }}>
                   <span className={cn("grid size-5 place-items-center rounded-full", fail ? "bg-bad-quiet text-bad" : pass ? "bg-ok-quiet text-ok" : "bg-raised text-text-3")}>{fail ? "×" : pass ? <Check className="size-3" strokeWidth={3} /> : ""}</span>
                   {c}
                   {fail && <span className="text-bad">Already used</span>}

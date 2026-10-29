@@ -6,7 +6,7 @@ import { PRIMUS_DOCS } from "@/lib/config";
 
 export const metadata: Metadata = { title: "Developers", description: "Quickstart, concepts and the HTTP API." };
 
-const CODE = (s: string) => <pre className="mono overflow-x-auto rounded-panel bg-[#0B1424] p-4 text-[12.5px] leading-relaxed text-[#D6DEEE]"><code>{s}</code></pre>;
+const CODE = (s: string) => <pre tabIndex={0} className="mono overflow-x-auto rounded-panel bg-[#0B1424] p-4 text-[12.5px] leading-relaxed text-[#D6DEEE]"><code>{s}</code></pre>;
 
 export default function Developers() {
   return (
