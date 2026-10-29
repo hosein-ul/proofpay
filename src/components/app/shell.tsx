@@ -16,7 +16,9 @@ import { Time } from "@/components/ui/copy";
 import { STATE_LABEL } from "@/lib/domain/types";
 import type { Mode, TaskEvent } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";
-import { CommandPalette, type PaletteData } from "./command-palette";
+import dynamic from "next/dynamic";
+import { MotionConfig } from "motion/react";
+import type { PaletteData } from "./command-palette";
 import { AppProvider, useApp, type RoleView } from "./context";
 
 const NAV: { href: string; label: string; icon: React.ComponentType<{ className?: string; "aria-hidden"?: boolean }>; exact?: boolean }[] = [
@@ -31,11 +33,13 @@ const NAV: { href: string; label: string; icon: React.ComponentType<{ className?
 export function AppShell({ mode, palette, counts, children }: { mode: Mode; palette: PaletteData; counts: { tasks: number; attention: number }; children: React.ReactNode }) {
   return (
     <AppProvider mode={mode}>
-      <TooltipProvider>
-        <ShellInner palette={palette} counts={counts}>
-          {children}
-        </ShellInner>
-      </TooltipProvider>
+      <MotionConfig reducedMotion="user">
+        <TooltipProvider>
+          <ShellInner palette={palette} counts={counts}>
+            {children}
+          </ShellInner>
+        </TooltipProvider>
+      </MotionConfig>
     </AppProvider>
   );
 }
@@ -81,7 +85,7 @@ function ShellInner({ palette, counts, children }: { palette: PaletteData; count
           {children}
         </main>
       </div>
-      <CommandPalette data={palette} />
+      <LazyPalette data={palette} />
       <ShortcutsDialog />
       <ActivityDrawer />
     </div>
@@ -321,4 +325,27 @@ function ActivityDrawer() {
       )}
     </Sheet>
   );
+}
+
+const CommandPalette = dynamic(() => import("./command-palette").then((m) => m.CommandPalette), { ssr: false });
+
+/** cmdk is only fetched when the palette is first opened (click or Ctrl/⌘ K), which keeps it off the critical path. */
+function LazyPalette({ data }: { data: PaletteData }) {
+  const { paletteOpen, setPaletteOpen } = useApp();
+  const [armed, setArmed] = useState(false);
+  useEffect(() => {
+    if (paletteOpen) setArmed(true);
+  }, [paletteOpen]);
+  useEffect(() => {
+    if (armed) return;
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setPaletteOpen(true);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [armed, setPaletteOpen]);
+  return armed ? <CommandPalette data={data} /> : null;
 }

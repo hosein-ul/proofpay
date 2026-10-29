@@ -97,3 +97,14 @@ test("the site never claims what it must not", async ({ page }) => {
     for (const bad of ["audited by", "bank-grade", "fully regulated", "is regulated", "insured", "trustless", "guaranteed"]) expect(text, `${p} contains "${bad}"`).not.toContain(bad);
   }
 });
+
+test("command palette opens with Ctrl+K and navigates", async ({ page }) => {
+  await page.goto("/app");
+  await page.waitForLoadState("networkidle");
+  await page.keyboard.press("Control+k");
+  const box = page.getByRole("dialog").getByPlaceholder(/search|type a command/i);
+  await expect(box).toBeVisible({ timeout: 10_000 });
+  await box.fill("create task");
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(/\/app\/tasks\/new/);
+});

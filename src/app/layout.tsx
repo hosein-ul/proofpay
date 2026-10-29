@@ -35,7 +35,7 @@ export const viewport: Viewport = {
 };
 
 /** Sets data-theme before paint so there is no flash. "system" = no attribute. */
-const themeScript = `try{var t=localStorage.getItem('pp-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;var d=localStorage.getItem('pp-density');if(d==='compact')document.documentElement.dataset.density='compact'}catch(e){}`;
+const themeScript = `try{var t=localStorage.getItem('pp-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;var d=localStorage.getItem('pp-density');if(d==='compact')document.documentElement.dataset.density='compact';if(localStorage.getItem('pp-onboard-hidden')==='1')document.documentElement.dataset.onboardHidden='1'}catch(e){}`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (

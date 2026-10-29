@@ -26,7 +26,8 @@ export function markOnboarding(id: string) {
 
 export function Onboarding() {
   const [done, setDone] = useState<string[]>([]);
-  const [hidden, setHidden] = useState(true);
+  // Rendered on the server so new visitors get no layout shift; returning visitors who dismissed it are hidden by CSS before first paint.
+  const [hidden, setHidden] = useState(false);
   useEffect(() => {
     const read = () => {
       try {
@@ -43,7 +44,7 @@ export function Onboarding() {
   if (hidden) return null;
   const next = STEPS.find((s) => !done.includes(s.id));
   return (
-    <section aria-label="Getting started" className="relative mb-6 overflow-hidden rounded-stage bg-raised shadow-raised">
+    <section aria-label="Getting started" className="relative mb-6 [html[data-onboard-hidden]_&]:hidden overflow-hidden rounded-stage bg-raised shadow-raised">
       <div className="dots pointer-events-none absolute inset-y-0 right-0 w-1/2 opacity-60 [mask-image:linear-gradient(90deg,transparent,#000)]" aria-hidden />
       <div className="relative grid gap-5 p-5 md:grid-cols-[1fr_auto] md:items-center">
         <div className="grid gap-4">
@@ -72,7 +73,7 @@ export function Onboarding() {
         </div>
         <PlateStack count={4} size={120} className="hidden md:block" />
       </div>
-      <Button variant="ghost" size="icon-sm" className="absolute right-3 top-3" aria-label="Dismiss getting started" onClick={() => { try { localStorage.setItem("pp-onboard-hidden", "1"); } catch {} setHidden(true); }}>
+      <Button variant="ghost" size="icon-sm" className="absolute right-3 top-3" aria-label="Dismiss getting started" onClick={() => { try { localStorage.setItem("pp-onboard-hidden", "1"); document.documentElement.dataset.onboardHidden = "1"; } catch {} setHidden(true); }}>
         <X className="size-4" />
       </Button>
     </section>

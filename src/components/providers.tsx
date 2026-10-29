@@ -1,10 +1,12 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { MotionConfig } from "motion/react";
+import dynamic from "next/dynamic";
 import { useState } from "react";
-import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme";
+
+// sonner is only needed once something calls toast(); load it after hydration instead of in the first bundle.
+const Toaster = dynamic(() => import("sonner").then((m) => m.Toaster), { ssr: false });
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [client] = useState(
@@ -13,7 +15,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider>
       <QueryClientProvider client={client}>
-        <MotionConfig reducedMotion="user">
           {children}
           <Toaster
             position="bottom-right"
@@ -25,7 +26,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
               },
             }}
           />
-        </MotionConfig>
       </QueryClientProvider>
     </ThemeProvider>
   );
