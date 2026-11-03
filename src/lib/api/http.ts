@@ -21,9 +21,12 @@ export function errorResponse(e: unknown) {
   return json({ error: { code: "internal", message: "Something went wrong on our side. Nothing was changed." } }, { status: 500 });
 }
 
+const MAX_BODY = 64 * 1024;
+
 export async function parseBody<T>(req: Request, schema: ZodType<T>): Promise<T> {
   let raw: unknown = {};
   const text = await req.text();
+  if (text.length > MAX_BODY) throw new DomainError("bad_request", "The request body is too large.", 413);
   if (text) {
     try {
       raw = JSON.parse(text);
@@ -35,7 +38,9 @@ export async function parseBody<T>(req: Request, schema: ZodType<T>): Promise<T>
 }
 
 export function clientIp(req: Request): string {
-  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "local";
+  // Prefer headers a trusted edge sets (Vercel) over X-Forwarded-For, which a client can send itself.
+  const h = req.headers;
+  return h.get("x-vercel-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || h.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
 }
 
 export function limit(req: Request, bucket: string, n = 20, windowMs = 60_000) {

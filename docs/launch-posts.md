@@ -1,6 +1,6 @@
 # Launch posts (drafts)
 
-Rules used: say it is a **testnet beta**; say what is **Simulation**; never say audited, trustless, bank-grade or regulated; Primus is credited as plain text, with no implied partnership. Replace `<repo-url>` and `<demo-url>` before posting.
+Rules used: say it is a **testnet beta**; say what is **Simulation**; never say audited (internal review is fine, say so), trustless, bank-grade or regulated; Primus is credited as plain text, with no implied partnership. Replace `<repo-url>` and `<demo-url>` before posting.
 
 ## 1. X / Twitter thread (7 posts)
 
@@ -16,7 +16,7 @@ Rules used: say it is a **testnet beta**; say what is **Simulation**; never say 
 
 6/ What a proof does NOT do: it does not make the source truthful. A wrong dashboard gives a valid proof of a wrong number. The Trust Model page says this in plain words.
 
-7/ Built with Next.js, Foundry (30 contract tests), Playwright and axe. Unaudited, testnet only. Code: <repo-url>. Feedback welcome, especially from anyone paying agents for outcomes.
+7/ Built with Next.js, Foundry (34 contract tests), Playwright and axe. Internally reviewed, not independently audited, testnet only. Code: <repo-url>. Feedback welcome, especially from anyone paying agents for outcomes.
 
 ## 2. LinkedIn
 
@@ -29,9 +29,9 @@ A payer writes a rule ("conversions ≥ 1,200"), locks mock USDC, and the worker
 What I care about getting right:
 • It says what it does not prove: the source can still be wrong.
 • Simulation and Live are strictly separated and always labelled.
-• Accessibility checked in CI, 30 contract tests, no secrets in the client.
+• Accessibility checked in CI, 34 contract tests, no secrets in the client.
 
-It is a testnet beta, unaudited, and the Live path still needs a run against Primus' service. If you pay agents or contractors for measurable results, I would like to hear where this breaks. <demo-url>
+It is a testnet beta, internally reviewed but not independently audited, and the Live path still needs a run against Primus' service. If you pay agents or contractors for measurable results, I would like to hear where this breaks. <demo-url>
 
 ## 3. Show HN
 

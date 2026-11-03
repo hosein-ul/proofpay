@@ -84,7 +84,7 @@ contract ProofPayEscrowTest is Test {
         escrow.settle(ID, _good());
         assertEq(usdc.balanceOf(worker), AMOUNT);
         assertEq(usdc.balanceOf(address(escrow)), 0);
-        (, , , , , ProofPayEscrow.State st, , , , ) = escrow.tasks(ID);
+        (, , , , , , ProofPayEscrow.State st, , , , ) = escrow.tasks(ID);
         assertEq(uint8(st), uint8(ProofPayEscrow.State.Settled));
     }
 
@@ -294,6 +294,69 @@ contract ProofPayEscrowTest is Test {
         vm.prank(payer);
         vm.expectRevert(ProofPayEscrow.NotArbiter.selector);
         escrow.resolve(ID, false);
+    }
+
+    // ------------------------------------------------------------ audit-driven additions
+    uint256 constant SECP_N = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141;
+
+    /// An ECDSA signature re-encoded with s' = n - s (and flipped v) is also valid. It must not defeat replay protection.
+    function test_malleatedSignature_cannotReplay() public {
+        _funded();
+        Attestation memory a = _good();
+        escrow.settle(ID, a);
+
+        bytes32 id2 = keccak256("tsk_2");
+        vm.prank(payer);
+        escrow.createTask(id2, worker, AMOUNT, uint64(block.timestamp + 7 days), keccak256(bytes(URL)), keccak256(bytes(CONDS)), keccak256(bytes(PARAMS)), keccak256(bytes(DATA)));
+        vm.prank(payer);
+        escrow.fund(id2);
+
+        bytes memory sig = a.signatures[0];
+        bytes32 r;
+        bytes32 s;
+        uint8 v;
+        assembly { r := mload(add(sig, 32)) s := mload(add(sig, 64)) v := byte(0, mload(add(sig, 96))) }
+        Attestation memory b = _att(worker, a.timestamp);
+        b.signatures = new bytes[](1);
+        b.signatures[0] = abi.encodePacked(r, bytes32(SECP_N - uint256(s)), uint8(v == 27 ? 28 : 27));
+        // The mock verifier accepts the malleated signature (it is a valid one), so only the content-based replay key stops it.
+        verifier.verifyAttestation(b);
+        vm.expectRevert(ProofPayEscrow.Replayed.selector);
+        escrow.settle(id2, b);
+    }
+
+    function test_splitStale_afterArbiterTimeout() public {
+        _funded();
+        vm.prank(payer);
+        escrow.dispute(ID);
+        vm.expectRevert(ProofPayEscrow.ArbiterStillHasTime.selector);
+        escrow.splitStale(ID);
+        vm.warp(block.timestamp + 30 days);
+        escrow.splitStale(ID);
+        assertEq(usdc.balanceOf(worker), AMOUNT / 2);
+        assertEq(usdc.balanceOf(address(escrow)), 0);
+    }
+
+    function test_splitStale_notIfArbiterResolvedFirst() public {
+        _funded();
+        vm.prank(payer);
+        escrow.dispute(ID);
+        vm.prank(arbiter);
+        escrow.resolve(ID, true);
+        vm.warp(block.timestamp + 31 days);
+        vm.expectRevert(abi.encodeWithSelector(ProofPayEscrow.BadState.selector, ProofPayEscrow.State.Resolved));
+        escrow.splitStale(ID);
+    }
+
+    function test_zeroAddresses_rejected() public {
+        vm.expectRevert(ProofPayEscrow.ZeroAddress.selector);
+        new ProofPayEscrow(usdc, IPrimusZKTLS(address(verifier)), address(0), admin);
+        vm.startPrank(admin);
+        vm.expectRevert(ProofPayEscrow.ZeroAddress.selector);
+        escrow.setArbiter(address(0));
+        vm.expectRevert(ProofPayEscrow.ZeroAddress.selector);
+        escrow.setVerifier(IPrimusZKTLS(address(0)));
+        vm.stopPrank();
     }
 
     // ------------------------------------------------------------ access control and setup

@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: "Security and Trust Model", descripti
 export default function Security() {
   return (
     <>
-      <PageHero eyebrow="Security" title="What we claim, and what we don’t" lead="This is a testnet beta. The contracts are unaudited and hold mock tokens only. Here is the model in plain terms." />
+      <PageHero eyebrow="Security" title="What we claim, and what we don’t" lead="This is a testnet beta. The contracts were reviewed internally, not independently audited, and hold mock tokens only. Here is the model in plain terms." />
       <Section title="Trust Model"><TrustModel /></Section>
       <Section title="Controls in the escrow" tone="sunk">
         <div className="grid gap-4 md:grid-cols-3">
@@ -19,7 +19,7 @@ export default function Security() {
       </Section>
       <Section title="Known limits">
         <ul className="grid max-w-[70ch] gap-2 text-[15px] text-text-2 [&_li]:ml-5 [&_li]:list-disc">
-          <li>Contracts are not audited. Do not use them with real funds.</li>
+          <li>Reviewed internally (Slither plus manual review, findings fixed), but not independently audited. Do not use them with real funds. <a className="underline" href="https://github.com/hosein-ul/proofpay/blob/main/SECURITY.md">Read the review</a>.</li>
           <li>Simulation uses a public local test key as its attestor. It demonstrates the checks, not Primus’ network.</li>
           <li>The data source is trusted for its own numbers. A wrong dashboard produces a valid proof of a wrong number.</li>
           <li>Disputes are resolved by a named arbiter, which is a trust assumption.</li>

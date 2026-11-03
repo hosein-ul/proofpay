@@ -12,7 +12,7 @@ const FAQ = [
   ["What does a proof actually prove?", "That a source returned a response over TLS, that a registered attestor signed it, and, for a threshold rule, that the rule held. It does not prove the source is truthful, or that someone did the work."],
   ["Who can sign a proof?", "Only attestors registered with the verifier contract. In Simulation that is one local test key, clearly marked."],
   ["Can a proof be reused?", "No. Each proof digest is consumed once, and it is bound to one task and one worker address."],
-  ["Is it audited?", "No. The contracts are testnet code and have not been audited. Do not use them with real funds."],
+  ["Is it audited?", "Not independently. We reviewed the contracts and API ourselves (static analysis plus manual review, with the findings fixed and published), but no outside auditor has. Treat them as testnet code and do not use them with real funds."],
   ["What if nobody proves anything?", "After the deadline the payer refunds in one step."],
 ];
 

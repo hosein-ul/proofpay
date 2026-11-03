@@ -264,6 +264,7 @@ const buckets = new Map<string, Bucket>();
 /** Token window: `limit` calls per `windowMs` per key. In-memory; swap for Redis when deployed with more than one instance. */
 export function rateLimit(key: string, limit = 20, windowMs = 60_000) {
   const now = Date.now();
+  if (buckets.size > 5000) for (const [k, v] of buckets) if (v.reset < now) buckets.delete(k); // bound memory
   const b = buckets.get(key);
   if (!b || b.reset < now) {
     buckets.set(key, { n: 1, reset: now + windowMs });

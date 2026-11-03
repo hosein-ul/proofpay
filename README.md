@@ -2,7 +2,7 @@
 
 Escrow that pays when a verified fact says so. A payer locks mock USDC against a condition; the worker proves it with a [Primus zkTLS](https://docs.primuslabs.xyz) attestation; the escrow verifies the proof and releases the funds.
 
-**Status: testnet beta.** Mock 6-decimals USDC on Base Sepolia, or Simulation with no chain at all. Contracts are **unaudited**. Do not use real funds. The product name lives in one constant (`src/lib/config.ts`).
+**Status: testnet beta.** Mock 6-decimals USDC on Base Sepolia, or Simulation with no chain at all. Contracts were **reviewed internally but not independently audited** ([SECURITY.md](SECURITY.md)). Do not use real funds. The product name lives in one constant (`src/lib/config.ts`).
 
 ![Overview, light](docs/screenshots/s-app-light.png)
 
@@ -33,7 +33,7 @@ Demo data is seeded automatically (8 workers, ~36 tasks over ~72 days). `pnpm se
 | `pnpm lint` / `typecheck` | ESLint, `tsc --noEmit` |
 | `pnpm test` | Vitest: domain, verification, service, Live mapping, API docs registry |
 | `pnpm test:e2e` | Playwright flows + axe accessibility on 14 pages × 2 themes (`PW_CHROMIUM=/path/to/chrome` to reuse an installed browser) |
-| `pnpm contracts:install` / `contracts:test` | Foundry deps / 30 contract tests ([install Foundry](https://book.getfoundry.sh)) |
+| `pnpm contracts:install` / `contracts:test` | Foundry deps / 34 contract tests ([install Foundry](https://book.getfoundry.sh)) |
 | `pnpm seed` | Reset and reseed demo data |
 
 ## What's in the box
@@ -86,7 +86,7 @@ Secrets never reach the client bundle: `appSecret` is used only in `src/lib/serv
 
 ## Limitations
 
-- Unaudited contracts, testnet only. Live path not exercised against Primus (D6).
+- Contracts are internally reviewed, **not independently audited**; testnet only. Live path not exercised against Primus (D6).
 - The data source is trusted for its own numbers: a wrong dashboard yields a valid proof of a wrong number. Disputes rely on a named arbiter.
 - Browser-extension attestation only (that is how the SDK works); no server-side proof generation.
 - Demo auth: roles are a view switch, not accounts. API keys/members in Settings are demo data.
