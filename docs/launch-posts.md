@@ -1,10 +1,10 @@
 # Launch posts (drafts)
 
-Rules used: say it is a **testnet beta**; say what is **Simulation**; never say audited (internal review is fine, say so), trustless, bank-grade or regulated; Primus is credited as plain text, with no implied partnership. Replace `<repo-url>` and `<demo-url>` before posting.
+Rules used: say it is a **testnet beta**; say what is **Simulation**; never say audited (internal review is fine, say so), trustless, bank-grade or regulated; Primus is credited as plain text, with no implied partnership. Replace `https://github.com/hosein-ul/proofpay` and `https://proofpay-theta.vercel.app` before posting.
 
 ## 1. X / Twitter thread (7 posts)
 
-1/ I built ProofPay: an escrow that pays when a verified fact says so, not when someone clicks "approve". Testnet beta, mock USDC, open source. <demo-url>
+1/ I built ProofPay: an escrow that pays when a verified fact says so, not when someone clicks "approve". Testnet beta, mock USDC, open source. https://proofpay-theta.vercel.app
 
 2/ The problem: paying a person or an AI agent for an outcome ("1,200 conversions", "uptime ≥ 99.9%") usually means invoices, screenshots and trust. Someone decides it is done, and that someone is often the one paying.
 
@@ -16,7 +16,7 @@ Rules used: say it is a **testnet beta**; say what is **Simulation**; never say 
 
 6/ What a proof does NOT do: it does not make the source truthful. A wrong dashboard gives a valid proof of a wrong number. The Trust Model page says this in plain words.
 
-7/ Built with Next.js, Foundry (34 contract tests), Playwright and axe. Internally reviewed, not independently audited, testnet only. Code: <repo-url>. Feedback welcome, especially from anyone paying agents for outcomes.
+7/ Built with Next.js, Foundry (34 contract tests), Playwright and axe. Internally reviewed, not independently audited, testnet only. Code: https://github.com/hosein-ul/proofpay. Feedback welcome, especially from anyone paying agents for outcomes.
 
 ## 2. LinkedIn
 
@@ -31,7 +31,7 @@ What I care about getting right:
 • Simulation and Live are strictly separated and always labelled.
 • Accessibility checked in CI, 34 contract tests, no secrets in the client.
 
-It is a testnet beta, internally reviewed but not independently audited, and the Live path still needs a run against Primus' service. If you pay agents or contractors for measurable results, I would like to hear where this breaks. <demo-url>
+It is a testnet beta, internally reviewed but not independently audited, and the Live path still needs a run against Primus' service. If you pay agents or contractors for measurable results, I would like to hear where this breaks. https://proofpay-theta.vercel.app
 
 ## 3. Show HN
 
@@ -41,7 +41,7 @@ I wanted to see if "pay on proof" can be made boring and inspectable. A payer lo
 
 Things I tried to be straight about: Simulation uses a local test attestor; the Live path is typed against SDK 0.3.15 but not run against Primus yet (assumptions are in DECISIONS.md); contracts are unaudited; a proof only shows the source said something, not that it is true.
 
-There is a Proof tools page that verifies any pasted attestation in the browser. Stack: Next.js, SQLite, viem, Foundry. <repo-url>
+There is a Proof tools page that verifies any pasted attestation in the browser. Stack: Next.js, SQLite, viem, Foundry. https://github.com/hosein-ul/proofpay
 
 ## 4. Product Hunt tagline and description
 
@@ -52,7 +52,7 @@ Description: ProofPay locks mock USDC against a rule and releases it when a zkTL
 ## 5. Short post (Persian)
 
 ProofPay رو ساختم: یک escrow تستی که وقتی یک «واقعیت اثبات‌شده» تایید بشه، پول رو آزاد می‌کنه، نه وقتی کسی دکمهٔ تایید رو بزنه. پرداخت‌کننده پول (USDC آزمایشی) رو روی یک قانون قفل می‌کنه، کارگر (آدم یا ایجنت هوش مصنوعی) با اثبات zkTLS قانون رو ثابت می‌کنه (Proofs by Primus zkTLS)، و escrow شش بررسی رو انجام می‌ده.
-نسخهٔ بتای تست‌نت، حسابرسی نشده، بدون پول واقعی. حالت Simulation همه‌جا برچسب داره و مسیر Live هنوز با سرویس واقعی Primus امتحان نشده. <demo-url> · <repo-url>
+نسخهٔ بتای تست‌نت، حسابرسی نشده، بدون پول واقعی. حالت Simulation همه‌جا برچسب داره و مسیر Live هنوز با سرویس واقعی Primus امتحان نشده. https://proofpay-theta.vercel.app · https://github.com/hosein-ul/proofpay
 
 ## 6. Alt text for the OG image
 

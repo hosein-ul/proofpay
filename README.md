@@ -4,6 +4,8 @@ Escrow that pays when a verified fact says so. A payer locks mock USDC against a
 
 **Status: testnet beta.** Mock 6-decimals USDC on Base Sepolia, or Simulation with no chain at all. Contracts were **reviewed internally but not independently audited** ([SECURITY.md](SECURITY.md)). Do not use real funds. The product name lives in one constant (`src/lib/config.ts`).
 
+**Live demo (Simulation, Neon Postgres): https://proofpay-theta.vercel.app** · app at `/app`
+
 ![Overview, light](docs/screenshots/s-app-light.png)
 
 ## Live vs Simulation (read this first)
@@ -96,3 +98,7 @@ Secrets never reach the client bundle: `appSecret` is used only in `src/lib/serv
 ## Brand and attribution
 
 "Proofs by Primus zkTLS" is plain-text attribution. This project is independent and is not endorsed by or affiliated with Primus. Third-party marks (via `simple-icons` and `@web3icons/react`) belong to their owners and indicate systems a proof could be built on, not partnerships.
+
+## Deploying
+
+The demo runs on Vercel with a Neon Postgres database. Set `DATABASE_URL` (pooled), `ADMIN_TOKEN`, `IP_SALT` and, for a public Simulation demo only, `PUBLIC_DEMO=1`. The schema is created on first request and demo data is seeded once (guarded by a Postgres advisory lock). In production, switching mode and the admin list need `ADMIN_TOKEN`.
