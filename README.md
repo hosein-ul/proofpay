@@ -25,7 +25,7 @@ pnpm install
 pnpm dev          # http://localhost:3000  (site)   /app  (the product)
 ```
 
-Demo data is seeded automatically (8 workers, ~36 tasks over ~72 days). `pnpm seed` reseeds; **Settings → Reset demo data** does the same from the UI. The SQLite file lives in your temp dir unless `DATABASE_FILE` is set.
+Demo data is seeded automatically (8 workers, ~36 tasks over ~72 days). `pnpm seed` reseeds; **Settings → Reset demo data** does the same from the UI. Locally it runs on PGlite (an in-process Postgres, in your temp dir unless `DATABASE_FILE` is set); set `DATABASE_URL` to use any Postgres such as Neon or Supabase.
 
 | Script | What it does |
 |---|---|
@@ -91,7 +91,7 @@ Secrets never reach the client bundle: `appSecret` is used only in `src/lib/serv
 - Browser-extension attestation only (that is how the SDK works); no server-side proof generation.
 - Demo auth: roles are a view switch, not accounts. API keys/members in Settings are demo data.
 - Legal pages are templates, the security contact is a placeholder, the name is a working title.
-- SQLite in a temp directory: fine for a demo, not for production.
+- Local dev uses PGlite (single process); deployments use Postgres via `DATABASE_URL`. The schema is created on start, there are no versioned migrations yet.
 
 ## Brand and attribution
 

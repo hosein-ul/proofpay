@@ -2,7 +2,7 @@
 
 ## Done
 - **Phase 0** research and brand: docs/primus-notes.md, DECISIONS.md, docs/copy-options.md; nine brand directions (`.design/`), "Descent" chosen.
-- **Phase 1** foundation: tokens, design system, domain model and state machine, SQLite + seed, HTTP API.
+- **Phase 1** foundation: tokens, design system, domain model and state machine, Postgres (PGlite locally) + seed, HTTP API.
 - **Phase 2** app (Simulation): overview, task builder, task detail, Proof Inspector, proofs, ledger, workers, settings, command palette, 404/error.
 - **Phase 3** website and docs: home with interactive demo, product, use cases, security/Trust Model, developers + API reference, request access, status, changelog, brand, legal templates, `/design`, OG image, sitemap/robots.
 - **Phase 4** real integration: `ProofPayEscrow` + 30 Foundry tests, `SignatureVerifier` (test/demo), deploy script, `PrimusProvider` (typed against SDK 0.3.15), signed-request endpoint, demo partner API.

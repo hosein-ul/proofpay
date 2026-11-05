@@ -109,3 +109,38 @@ describe("settlement lifecycle", () => {
     expect(cond.conditionHashOf(condition)).not.toBe(cond.conditionHashOf({ ...condition, threshold: 121 }));
   });
 });
+
+describe("concurrency (the write lock)", () => {
+  const mk = async () => {
+    const w = (await repo.listWorkers())[0];
+    return svc.createTask({ title: "race", workerId: w.id, amountUsdc: 100, condition, deadline: future(), refundPolicy: "auto" });
+  };
+
+  it("funds a task exactly once when two requests race", async () => {
+    const t = await mk();
+    const before = (await repo.listLedger({ taskId: t.id })).length;
+    const results = await Promise.allSettled([svc.fundTask(t.id), svc.fundTask(t.id)]);
+    expect(results.filter((r) => r.status === "fulfilled")).toHaveLength(1);
+    const rejected = results.find((r) => r.status === "rejected") as PromiseRejectedResult;
+    expect(String(rejected.reason?.message ?? rejected.reason)).toMatch(/funded|awaiting|invalid|transition/i);
+    expect((await repo.listLedger({ taskId: t.id })).length - before).toBe(1);
+  });
+
+  it("settles once and pays once when the same proof is submitted twice at the same time", async () => {
+    const t = await mk();
+    await svc.fundTask(t.id);
+    const before = (await repo.listLedger({ taskId: t.id })).filter((l) => l.kind === "release").length;
+    const actor = { role: "worker" as const, name: "Ada" };
+    const results = await Promise.allSettled([svc.submitProof(t.id, { value: 150 }, actor), svc.submitProof(t.id, { value: 150 }, actor)]);
+    expect(results.filter((r) => r.status === "fulfilled" && (r.value as { settled: boolean }).settled)).toHaveLength(1);
+    expect((await repo.listLedger({ taskId: t.id })).filter((l) => l.kind === "release").length - before).toBe(1);
+    expect((await repo.getTask(t.id))!.state).toBe("settled");
+  });
+
+  it("keeps the ledger balance equal to locks minus releases and refunds after the races", async () => {
+    const all = await repo.listLedger();
+    const sum = all.reduce((s, l) => s + (l.kind === "escrow_in" ? l.amount : -l.amount), 0);
+    const newest = [...all].sort((a, b) => b.at.localeCompare(a.at))[0];
+    expect(newest.balanceAfter).toBe(sum);
+  });
+});

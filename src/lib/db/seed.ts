@@ -3,7 +3,8 @@ import { SimulatedProvider } from "@/lib/domain/simulated-provider";
 import { conditionHashOf } from "@/lib/domain/condition";
 import { SIM_ATTESTOR_ADDRESS } from "@/lib/domain/attestation";
 import type { Attestation, Condition, LedgerKind, Op, Role, TaskState, Worker } from "@/lib/domain/types";
-import { getDb, getDbHandle, schema } from "./client";
+import { count, sql } from "drizzle-orm";
+import { getDb, schema } from "./client";
 
 const DAY = 86_400_000;
 const HOUR = 3_600_000;
@@ -127,17 +128,19 @@ function buildSpecs(): Spec[] {
   return specs;
 }
 
-export async function seedDemo() {
-  const { db, raw } = getDbHandle();
+/** Rebuilds the demo data in one transaction. A Postgres advisory lock makes concurrent cold starts take turns instead of colliding. */
+export async function seedDemo(opts: { onlyIfEmpty?: boolean } = {}) {
+  const db = await getDb();
+  await db.transaction(async (trx) => {
+    await trx.execute(sql`SELECT pg_advisory_xact_lock(746101)`);
+    if (opts.onlyIfEmpty && (await trx.select({ n: count() }).from(schema.tasks))[0].n > 0) return;
   const provider = new SimulatedProvider();
   const r = prng(7);
   const NOW = Date.now();
-  raw.exec(
-    "DELETE FROM workers; DELETE FROM tasks; DELETE FROM events; DELETE FROM ledger; DELETE FROM attestations; DELETE FROM consumed_proofs; DELETE FROM members; DELETE FROM api_keys; DELETE FROM webhooks; DELETE FROM webhook_deliveries; DELETE FROM idempotency;",
-  );
+  for (const t of [schema.workers, schema.tasks, schema.events, schema.ledger, schema.attestations, schema.consumedProofs, schema.members, schema.apiKeys, schema.webhooks, schema.webhookDeliveries, schema.idempotency]) await trx.delete(t);
 
   const workers: Worker[] = WORKERS.map((w, i) => ({ ...w, address: addr(w.id), createdAt: iso(NOW - (90 - i * 7) * DAY) }));
-  db.insert(schema.workers).values(workers).run();
+  await trx.insert(schema.workers).values(workers);
   const wById = new Map(workers.map((w) => [w.id, w]));
 
   const specs = buildSpecs();
@@ -294,10 +297,10 @@ export async function seedDemo() {
     });
   }
 
-  db.insert(schema.tasks).values(taskRows).run();
-  for (let i = 0; i < eventRows.length; i += 200) db.insert(schema.events).values(eventRows.slice(i, i + 200)).run();
-  for (let i = 0; i < attRows.length; i += 50) db.insert(schema.attestations).values(attRows.slice(i, i + 50)).run();
-  if (consumed.length) db.insert(schema.consumedProofs).values(consumed).run();
+  await trx.insert(schema.tasks).values(taskRows);
+  for (let i = 0; i < eventRows.length; i += 200) await trx.insert(schema.events).values(eventRows.slice(i, i + 200));
+  for (let i = 0; i < attRows.length; i += 50) await trx.insert(schema.attestations).values(attRows.slice(i, i + 50));
+  if (consumed.length) await trx.insert(schema.consumedProofs).values(consumed);
 
   // double-entry ledger, chronological, with running escrow balance
   ledgerSeed.sort((a, b) => a.at - b.at);
@@ -306,25 +309,25 @@ export async function seedDemo() {
     bal += e.kind === "escrow_in" ? e.amount : -e.amount;
     return { id: e.id, taskId: e.taskId, kind: e.kind, debit: e.debit, credit: e.credit, amount: e.amount, balanceAfter: bal, at: iso(e.at), txHash: e.tx };
   });
-  for (let i = 0; i < ledgerRows.length; i += 200) db.insert(schema.ledger).values(ledgerRows.slice(i, i + 200)).run();
+  for (let i = 0; i < ledgerRows.length; i += 200) await trx.insert(schema.ledger).values(ledgerRows.slice(i, i + 200));
 
-  db.insert(schema.members)
+  await trx.insert(schema.members)
     .values([
       { id: "m_1", name: "Maya Okonkwo", email: "maya@northgate.example", role: "payer", lastActive: iso(NOW - 12 * MIN) },
       { id: "m_2", name: "Daniel Ferreira", email: "daniel@northgate.example", role: "payer", lastActive: iso(NOW - 3 * HOUR) },
       { id: "m_3", name: "Sofia Lindqvist", email: "sofia@northgate.example", role: "auditor", lastActive: iso(NOW - 2 * DAY) },
       { id: "m_4", name: "Ada (agent key)", email: "agents@northgate.example", role: "worker", lastActive: iso(NOW - 40 * MIN) },
     ])
-    .run();
-  db.insert(schema.apiKeys)
+    ;
+  await trx.insert(schema.apiKeys)
     .values([
       { id: "k_1", name: "Production agent", prefix: "pp_test_8f2c", scope: "tasks:write proofs:write", createdAt: iso(NOW - 41 * DAY), lastUsed: iso(NOW - 40 * MIN) },
       { id: "k_2", name: "Read-only audit", prefix: "pp_test_21ab", scope: "ledger:read tasks:read", createdAt: iso(NOW - 12 * DAY), lastUsed: iso(NOW - 2 * DAY) },
     ])
-    .run();
-  db.insert(schema.webhooks)
+    ;
+  await trx.insert(schema.webhooks)
     .values([{ id: "wh_1", url: "https://hooks.northgate.example/proofpay", events: ["task.settled", "task.expired", "proof.failed"], active: true, createdAt: iso(NOW - 30 * DAY) }])
-    .run();
+    ;
   const deliveries = Array.from({ length: 12 }, (_, i) => ({
     id: `d_${i}`,
     webhookId: "wh_1",
@@ -333,25 +336,18 @@ export async function seedDemo() {
     durationMs: 90 + Math.floor(r() * 400),
     at: iso(NOW - (i * 9 + 4) * HOUR),
   }));
-  db.insert(schema.webhookDeliveries).values(deliveries).run();
-  db.insert(schema.settings).values([{ key: "mode", value: "simulation" }, { key: "workspace", value: "Northgate Growth" }]).onConflictDoNothing().run();
+  await trx.insert(schema.webhookDeliveries).values(deliveries);
+  await trx.insert(schema.settings).values([{ key: "mode", value: "simulation" }, { key: "workspace", value: "Northgate Growth" }]).onConflictDoNothing();
   void SIM_ATTESTOR_ADDRESS;
-}
-
-export function isSeeded(): boolean {
-  const { raw } = getDbHandle();
-  const row = raw.prepare("SELECT COUNT(*) AS n FROM tasks").get() as { n: number };
-  return row.n > 0;
+  });
 }
 
 type G = typeof globalThis & { __pp_seed?: Promise<void> };
+/** Seeds an empty database once per process. Safe if several instances start at the same time. */
 export function ensureSeeded(): Promise<void> {
   const g = globalThis as G;
-  if (!g.__pp_seed) {
-    g.__pp_seed = (async () => {
-      getDb();
-      if (!isSeeded()) await seedDemo();
-    })();
-  }
-  return g.__pp_seed;
+  return (g.__pp_seed ??= seedDemo({ onlyIfEmpty: true }).catch((e) => {
+    g.__pp_seed = undefined;
+    throw e;
+  }));
 }

@@ -7,7 +7,7 @@ import { EmptyState } from "@/components/ui/feedback";
 import { Identicon } from "@/components/ui/identicon";
 import { PROOF_ERRORS } from "@/lib/domain/errors";
 import { conditionText } from "@/lib/domain/condition";
-import { getDb, schema } from "@/lib/db/client";
+import {  schema } from "@/lib/db/client";
 import { listTasks, listWorkers, ready } from "@/lib/server/repo";
 import type { Attestation, VerificationResult } from "@/lib/domain/types";
 import { desc } from "drizzle-orm";
@@ -16,11 +16,11 @@ export const metadata: Metadata = { title: "Proofs" };
 export const dynamic = "force-dynamic";
 
 export default async function ProofsPage() {
-  await ready();
+  const db = await ready();
   const [tasks, workers] = await Promise.all([listTasks(), listWorkers()]);
   const t = new Map(tasks.map((x) => [x.id, x]));
   const w = new Map(workers.map((x) => [x.id, x]));
-  const rows = getDb().select().from(schema.attestations).orderBy(desc(schema.attestations.createdAt)).all();
+  const rows = await db.select().from(schema.attestations).orderBy(desc(schema.attestations.createdAt));
   return (
     <>
       <PageHeader title="Proofs" description="Every attestation submitted in this workspace, with its verification result. Open one to see what each side saw." />

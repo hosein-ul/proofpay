@@ -40,7 +40,7 @@ const nextConfig: NextConfig = {
       },
     },
   },
-  serverExternalPackages: ["better-sqlite3"],
+  serverExternalPackages: ["@electric-sql/pglite", "pg"],
 };
 
 export default nextConfig;

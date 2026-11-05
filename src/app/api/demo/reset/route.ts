@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export async function POST(req: Request) {
   return handle(async () => {
     requireOperator(req, { allowPublicDemo: true });
-    limit(req, "reset", Number(process.env.RESET_LIMIT ?? 3), 10 * 60_000);
+    limit(req, "reset", process.env.NODE_ENV === "production" ? Number(process.env.RESET_LIMIT ?? 3) : 1000, 10 * 60_000);
     await ready();
     if ((await getMode()) !== "simulation") throw new DomainError("forbidden", "Reset is only available in Simulation.", 403);
     await seedDemo();

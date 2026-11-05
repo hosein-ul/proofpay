@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { PageHero, Section } from "@/components/site/prose";
 import { Chip } from "@/components/ui/chips";
-import { getDbHandle } from "@/lib/db/client";
+import { sql } from "drizzle-orm";
 import { getMode, ready } from "@/lib/server/repo";
 
 export const metadata: Metadata = { title: "Status" };
@@ -11,7 +11,7 @@ export default async function Status() {
   const t0 = performance.now();
   let db = false;
   let mode = "simulation";
-  try { await ready(); getDbHandle().raw.prepare("SELECT 1").get(); db = true; mode = await getMode(); } catch {}
+  try { const d = await ready(); await d.execute(sql`SELECT 1`); db = true; mode = await getMode(); } catch {}
   const ms = Math.round(performance.now() - t0);
   const rows = [
     ["Web app and API", db, db ? `Responding in ${ms} ms` : "Not responding"],

@@ -1,7 +1,7 @@
 import "server-only";
-import { and, asc, desc, eq, gte, inArray, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte, inArray } from "drizzle-orm";
 import { ensureSeeded } from "@/lib/db/seed";
-import { getDb, getDbHandle, schema } from "@/lib/db/client";
+import { getDb, schema } from "@/lib/db/client";
 import type {
   Attestation,
   LedgerEntry,
@@ -18,7 +18,7 @@ const DAY = 86_400_000;
 
 export async function ready() {
   await ensureSeeded();
-  return getDb();
+  return await getDb();
 }
 
 type TaskRow = typeof schema.tasks.$inferSelect;
@@ -67,11 +67,12 @@ const toLedger = (r: typeof schema.ledger.$inferSelect): LedgerEntry => ({
 
 export async function listWorkers(): Promise<Worker[]> {
   const db = await ready();
-  return db.select().from(schema.workers).all() as Worker[];
+  return (await db.select().from(schema.workers)) as Worker[];
 }
 export async function getWorker(id: string): Promise<Worker | null> {
   const db = await ready();
-  return ((db.select().from(schema.workers).where(eq(schema.workers.id, id)).get() as Worker | undefined) ?? null);
+  const [r] = await db.select().from(schema.workers).where(eq(schema.workers.id, id)).limit(1);
+  return (r as Worker | undefined) ?? null;
 }
 
 export async function listTasks(opts: { states?: TaskState[]; workerId?: string; limit?: number } = {}): Promise<Task[]> {
@@ -84,25 +85,25 @@ export async function listTasks(opts: { states?: TaskState[]; workerId?: string;
     .from(schema.tasks)
     .where(conds.length ? and(...conds) : undefined)
     .orderBy(desc(schema.tasks.updatedAt));
-  const rows = opts.limit ? q.limit(opts.limit).all() : q.all();
+  const rows = await (opts.limit ? q.limit(opts.limit) : q);
   return rows.map(toTask);
 }
 
 export async function getTask(id: string): Promise<Task | null> {
   const db = await ready();
-  const r = db.select().from(schema.tasks).where(eq(schema.tasks.id, id)).get();
+  const [r] = await db.select().from(schema.tasks).where(eq(schema.tasks.id, id)).limit(1);
   return r ? toTask(r) : null;
 }
 
 export async function getTaskDetail(id: string) {
   const db = await ready();
-  const t = db.select().from(schema.tasks).where(eq(schema.tasks.id, id)).get();
+  const [t] = await db.select().from(schema.tasks).where(eq(schema.tasks.id, id)).limit(1);
   if (!t) return null;
   const task = toTask(t);
   const worker = await getWorker(task.workerId);
-  const events = db.select().from(schema.events).where(eq(schema.events.taskId, id)).orderBy(asc(schema.events.at)).all().map(toEvent);
-  const atts = db.select().from(schema.attestations).where(eq(schema.attestations.taskId, id)).orderBy(desc(schema.attestations.createdAt)).all();
-  const ledger = db.select().from(schema.ledger).where(eq(schema.ledger.taskId, id)).orderBy(asc(schema.ledger.at)).all().map(toLedger);
+  const events = (await db.select().from(schema.events).where(eq(schema.events.taskId, id)).orderBy(asc(schema.events.at))).map(toEvent);
+  const atts = await db.select().from(schema.attestations).where(eq(schema.attestations.taskId, id)).orderBy(desc(schema.attestations.createdAt));
+  const ledger = (await db.select().from(schema.ledger).where(eq(schema.ledger.taskId, id)).orderBy(asc(schema.ledger.at))).map(toLedger);
   return {
     task,
     worker: worker!,
@@ -119,7 +120,7 @@ export async function getTaskDetail(id: string) {
 
 export async function getAttestation(id: string) {
   const db = await ready();
-  const a = db.select().from(schema.attestations).where(eq(schema.attestations.id, id)).get();
+  const [a] = await db.select().from(schema.attestations).where(eq(schema.attestations.id, id)).limit(1);
   if (!a) return null;
   const task = await getTask(a.taskId);
   const worker = task ? await getWorker(task.workerId) : null;
@@ -128,13 +129,13 @@ export async function getAttestation(id: string) {
 
 export async function latestAttestationForTask(taskId: string) {
   const db = await ready();
-  const a = db.select().from(schema.attestations).where(eq(schema.attestations.taskId, taskId)).orderBy(desc(schema.attestations.createdAt)).limit(1).get();
+  const [a] = await db.select().from(schema.attestations).where(eq(schema.attestations.taskId, taskId)).orderBy(desc(schema.attestations.createdAt)).limit(1);
   return a ? { id: a.id, ok: a.ok } : null;
 }
 
 export async function consumedDigests(): Promise<Set<string>> {
   const db = await ready();
-  return new Set(db.select().from(schema.consumedProofs).all().map((r) => r.digest.toLowerCase()));
+  return new Set((await db.select().from(schema.consumedProofs)).map((r) => r.digest.toLowerCase()));
 }
 
 export async function listLedger(opts: { kind?: string; taskId?: string; since?: string } = {}): Promise<LedgerEntry[]> {
@@ -143,33 +144,31 @@ export async function listLedger(opts: { kind?: string; taskId?: string; since?:
   if (opts.kind) conds.push(eq(schema.ledger.kind, opts.kind));
   if (opts.taskId) conds.push(eq(schema.ledger.taskId, opts.taskId));
   if (opts.since) conds.push(gte(schema.ledger.at, opts.since));
-  return db
+  const rows = await db
     .select()
     .from(schema.ledger)
     .where(conds.length ? and(...conds) : undefined)
-    .orderBy(desc(schema.ledger.at))
-    .all()
-    .map(toLedger);
+    .orderBy(desc(schema.ledger.at));
+  return rows.map(toLedger);
 }
 
 export async function listEvents(limit = 60, opts: { significant?: boolean } = {}): Promise<(TaskEvent & { title: string })[]> {
   const db = await ready();
-  const rows = db
+  const rows = await db
     .select({ e: schema.events, title: schema.tasks.title })
     .from(schema.events)
     .leftJoin(schema.tasks, eq(schema.events.taskId, schema.tasks.id))
     .where(opts.significant ? inArray(schema.events.type, ["funded", "proof_started", "proof_failed", "verified", "settled", "expired", "refunded", "disputed", "resolved"]) : undefined)
     .orderBy(desc(schema.events.at))
-    .limit(limit)
-    .all();
+    .limit(limit);
   return rows.map((r) => ({ ...toEvent(r.e), title: r.title ?? r.e.taskId }));
 }
 
 export async function workerStats() {
   const db = await ready();
   const workers = await listWorkers();
-  const tasks = db.select().from(schema.tasks).all();
-  const atts = db.select().from(schema.attestations).all();
+  const tasks = await db.select().from(schema.tasks);
+  const atts = await db.select().from(schema.attestations);
   return workers.map((w) => {
     const mine = tasks.filter((t) => t.workerId === w.id);
     const settled = mine.filter((t) => t.state === "settled" || t.state === "resolved");
@@ -197,9 +196,9 @@ const HELD: TaskState[] = ["funded", "awaiting_proof", "proving", "verified", "d
 export async function getOverview(rangeDays = 30): Promise<Overview> {
   const db = await ready();
   const now = Date.now();
-  const tasks = db.select().from(schema.tasks).all();
-  const ledger = db.select().from(schema.ledger).orderBy(asc(schema.ledger.at)).all();
-  const atts = db.select().from(schema.attestations).all();
+  const tasks = await db.select().from(schema.tasks);
+  const ledger = await db.select().from(schema.ledger).orderBy(asc(schema.ledger.at));
+  const atts = await db.select().from(schema.attestations);
 
   const escrow = tasks.filter((t) => HELD.includes(t.state as TaskState)).reduce((s, t) => s + t.amount, 0);
   const releases = ledger.filter((l) => l.kind === "release");
@@ -268,8 +267,8 @@ export async function getOverview(rangeDays = 30): Promise<Overview> {
 export async function attentionQueue() {
   const db = await ready();
   const now = Date.now();
-  const tasks = db.select().from(schema.tasks).all().map(toTask);
-  const events = db.select().from(schema.events).all();
+  const tasks = (await db.select().from(schema.tasks)).map(toTask);
+  const events = await db.select().from(schema.events);
   const items: { task: Task; reason: "expiring" | "disputed" | "proof_failed" | "expired"; detail: string }[] = [];
   for (const t of tasks) {
     const dl = new Date(t.deadline).getTime();
@@ -288,36 +287,31 @@ export async function attentionQueue() {
 
 export async function listAccessRequests() {
   const db = await ready();
-  return db.select().from(schema.accessRequests).orderBy(desc(schema.accessRequests.createdAt)).all();
+  return await db.select().from(schema.accessRequests).orderBy(desc(schema.accessRequests.createdAt));
 }
 
 export async function settingsData() {
   const db = await ready();
   return {
-    members: db.select().from(schema.members).all(),
-    keys: db.select().from(schema.apiKeys).all(),
-    webhooks: db.select().from(schema.webhooks).all(),
-    deliveries: db.select().from(schema.webhookDeliveries).orderBy(desc(schema.webhookDeliveries.at)).all(),
+    members: await db.select().from(schema.members),
+    keys: await db.select().from(schema.apiKeys),
+    webhooks: await db.select().from(schema.webhooks),
+    deliveries: await db.select().from(schema.webhookDeliveries).orderBy(desc(schema.webhookDeliveries.at)),
   };
 }
 
 export async function getMode(): Promise<Mode> {
   const db = await ready();
-  const r = db.select().from(schema.settings).where(eq(schema.settings.key, "mode")).get();
+  const [r] = await db.select().from(schema.settings).where(eq(schema.settings.key, "mode")).limit(1);
   return (r?.value as Mode) ?? "simulation";
 }
 export async function setMode(mode: Mode) {
   const db = await ready();
-  db.insert(schema.settings).values({ key: "mode", value: mode }).onConflictDoUpdate({ target: schema.settings.key, set: { value: mode } }).run();
+  await db.insert(schema.settings).values({ key: "mode", value: mode }).onConflictDoUpdate({ target: schema.settings.key, set: { value: mode } });
 }
 
 export async function counts() {
-  const { raw } = getDbHandle();
-  void sql;
-  return {
-    tasks: (raw.prepare("SELECT COUNT(*) n FROM tasks").get() as { n: number }).n,
-    workers: (raw.prepare("SELECT COUNT(*) n FROM workers").get() as { n: number }).n,
-    events: (raw.prepare("SELECT COUNT(*) n FROM events").get() as { n: number }).n,
-    ledger: (raw.prepare("SELECT COUNT(*) n FROM ledger").get() as { n: number }).n,
-  };
+  const db = await ready();
+  const n = async (t: typeof schema.tasks | typeof schema.workers | typeof schema.events | typeof schema.ledger) => (await db.select({ n: count() }).from(t))[0].n;
+  return { tasks: await n(schema.tasks), workers: await n(schema.workers), events: await n(schema.events), ledger: await n(schema.ledger) };
 }

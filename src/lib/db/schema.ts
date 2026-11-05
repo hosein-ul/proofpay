@@ -1,7 +1,7 @@
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { bigint, boolean, index, integer, jsonb, pgTable, text } from "drizzle-orm/pg-core";
 import type { Attestation, Condition } from "@/lib/domain/types";
 
-export const workers = sqliteTable("workers", {
+export const workers = pgTable("workers", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   kind: text("kind").notNull(),
@@ -11,15 +11,15 @@ export const workers = sqliteTable("workers", {
   createdAt: text("created_at").notNull(),
 });
 
-export const tasks = sqliteTable(
+export const tasks = pgTable(
   "tasks",
   {
     id: text("id").primaryKey(),
     title: text("title").notNull(),
     workerId: text("worker_id").notNull(),
-    amount: integer("amount").notNull(),
+    amount: bigint("amount", { mode: "number" }).notNull(),
     token: text("token").notNull().default("USDC"),
-    condition: text("condition", { mode: "json" }).$type<Condition>().notNull(),
+    condition: jsonb("condition").$type<Condition>().notNull(),
     deadline: text("deadline").notNull(),
     refundPolicy: text("refund_policy").notNull().default("auto"),
     state: text("state").notNull(),
@@ -30,12 +30,12 @@ export const tasks = sqliteTable(
     fundedAt: text("funded_at"),
     settledAt: text("settled_at"),
     mode: text("mode").notNull().default("simulation"),
-    demo: integer("demo", { mode: "boolean" }).notNull().default(true),
+    demo: boolean("demo").notNull().default(true),
   },
   (t) => [index("tasks_state_idx").on(t.state), index("tasks_worker_idx").on(t.workerId)],
 );
 
-export const events = sqliteTable(
+export const events = pgTable(
   "events",
   {
     id: text("id").primaryKey(),
@@ -52,7 +52,7 @@ export const events = sqliteTable(
   (t) => [index("events_task_idx").on(t.taskId, t.at)],
 );
 
-export const ledger = sqliteTable(
+export const ledger = pgTable(
   "ledger",
   {
     id: text("id").primaryKey(),
@@ -60,35 +60,35 @@ export const ledger = sqliteTable(
     kind: text("kind").notNull(),
     debit: text("debit").notNull(),
     credit: text("credit").notNull(),
-    amount: integer("amount").notNull(),
-    balanceAfter: integer("balance_after").notNull(),
+    amount: bigint("amount", { mode: "number" }).notNull(),
+    balanceAfter: bigint("balance_after", { mode: "number" }).notNull(),
     at: text("at").notNull(),
     txHash: text("tx_hash"),
   },
   (t) => [index("ledger_at_idx").on(t.at)],
 );
 
-export const attestations = sqliteTable(
+export const attestations = pgTable(
   "attestations",
   {
     id: text("id").primaryKey(),
     taskId: text("task_id").notNull(),
     digest: text("digest").notNull(),
-    json: text("json", { mode: "json" }).$type<Attestation>().notNull(),
-    ok: integer("ok", { mode: "boolean" }),
-    verification: text("verification", { mode: "json" }),
+    json: jsonb("json").$type<Attestation>().notNull(),
+    ok: boolean("ok"),
+    verification: jsonb("verification"),
     createdAt: text("created_at").notNull(),
   },
   (t) => [index("att_task_idx").on(t.taskId)],
 );
 
-export const consumedProofs = sqliteTable("consumed_proofs", {
+export const consumedProofs = pgTable("consumed_proofs", {
   digest: text("digest").primaryKey(),
   taskId: text("task_id").notNull(),
   at: text("at").notNull(),
 });
 
-export const accessRequests = sqliteTable("access_requests", {
+export const accessRequests = pgTable("access_requests", {
   id: text("id").primaryKey(),
   email: text("email").notNull(),
   company: text("company").notNull(),
@@ -98,7 +98,7 @@ export const accessRequests = sqliteTable("access_requests", {
   ipHash: text("ip_hash"),
 });
 
-export const idempotency = sqliteTable("idempotency", {
+export const idempotency = pgTable("idempotency", {
   key: text("key").primaryKey(),
   route: text("route").notNull(),
   status: integer("status").notNull(),
@@ -106,7 +106,7 @@ export const idempotency = sqliteTable("idempotency", {
   createdAt: text("created_at").notNull(),
 });
 
-export const members = sqliteTable("members", {
+export const members = pgTable("members", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull(),
@@ -114,7 +114,7 @@ export const members = sqliteTable("members", {
   lastActive: text("last_active"),
 });
 
-export const apiKeys = sqliteTable("api_keys", {
+export const apiKeys = pgTable("api_keys", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   prefix: text("prefix").notNull(),
@@ -123,15 +123,15 @@ export const apiKeys = sqliteTable("api_keys", {
   lastUsed: text("last_used"),
 });
 
-export const webhooks = sqliteTable("webhooks", {
+export const webhooks = pgTable("webhooks", {
   id: text("id").primaryKey(),
   url: text("url").notNull(),
-  events: text("events", { mode: "json" }).$type<string[]>().notNull(),
-  active: integer("active", { mode: "boolean" }).notNull().default(true),
+  events: jsonb("events").$type<string[]>().notNull(),
+  active: boolean("active").notNull().default(true),
   createdAt: text("created_at").notNull(),
 });
 
-export const webhookDeliveries = sqliteTable("webhook_deliveries", {
+export const webhookDeliveries = pgTable("webhook_deliveries", {
   id: text("id").primaryKey(),
   webhookId: text("webhook_id").notNull(),
   event: text("event").notNull(),
@@ -140,7 +140,7 @@ export const webhookDeliveries = sqliteTable("webhook_deliveries", {
   at: text("at").notNull(),
 });
 
-export const settings = sqliteTable("settings", {
+export const settings = pgTable("settings", {
   key: text("key").primaryKey(),
   value: text("value").notNull(),
 });
